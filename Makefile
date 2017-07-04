@@ -18,6 +18,7 @@ DEBUG=1
 
 SRCDIR=.
 INCDIR=$(SRCDIR)/include
+BINDIR=$(SRCDIR)/bin
 
 # set this variable to another compiler, or gcc is the default
 CXX = gcc
@@ -49,6 +50,6 @@ endif
 all: main
 
 main: $(SRCDIR)/main.c $(INCDIR)/
-	$(CXX) $(CPPFLAGS)   $(SRCDIR)/main.c -o main $(CXXFLAGS)
+	$(CXX) $(CPPFLAGS)   $(SRCDIR)/main.c -o $(BINDIR)/main $(CXXFLAGS)
 clean:
-	rm -f main
+	rm -f $(BINDIR)/main
