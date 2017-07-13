@@ -1,9 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include <gap.h>
 
 int main (int argc, char** argv) {
-	printf("Hello, this is the GAP skeleton!\n");
-	return 1;
+	int b = readDataFromFile("README.md");
+	printf("b: %d\n", b);
+	return 0;
 }
