@@ -64,12 +64,12 @@ array_stack_is_empty (ArrayStack *stack)
 }
 
 ArrayStack *
-alist_new (size_t capacity)
+array_stack_new (size_t capacity)
 {
   ArrayStack *stack;
 
-  stack = malloc (sizeof (ArrayStack))
-    stack->elements = malloc (capacity * sizeof (void *));
+  stack = malloc (sizeof (ArrayStack));
+  stack->elements = malloc (capacity * sizeof (void *));
   stack->size = 0;
   stack->capacity = capacity;
 
