@@ -15,6 +15,8 @@
 
 #include <stdlib.h>
 
+#include "util.h"
+
 /**
  * ArrayStack ADT. All the fields are private. You should access them with the proper function.
  */

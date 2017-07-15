@@ -1,3 +1,5 @@
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "array_stack.h"
@@ -25,12 +27,14 @@ array_stack_clear (ArrayStack *stack, Destructor destroy)
 {
   int i;
 
+  assert (destroy != NULL);
+
   for (i = 0; i < stack->size; i++)
     {
       destroy (stack->elements[i]);
     }
 
-  alist->size = 0;
+  stack->size = 0;
 }
 
 void
@@ -47,14 +51,14 @@ void
 array_stack_free (ArrayStack *stack, Destructor destroy)
 {
   array_stack_clear (stack, destroy);
-  free (stack->elems);
+  free (stack->elements);
   free (stack);
 }
 
 static void
 array_stack_grow (ArrayStack *stack)
 {
-  array_stack_ensure_capacity (stack, array_stack_capacity (stack) * ARRAY_STACK_GROW_FACTOR);
+  array_stack_ensure_capacity (stack, array_stack_capacity (stack) * _ARRAY_STACK_GROW_FACTOR);
 }
 
 int
@@ -68,10 +72,24 @@ array_stack_new (size_t capacity)
 {
   ArrayStack *stack;
 
+  assert (capacity > 0);
+
   stack = malloc (sizeof (ArrayStack));
-  stack->elements = malloc (capacity * sizeof (void *));
   stack->size = 0;
   stack->capacity = capacity;
+
+  if (stack == NULL)
+    {
+      return NULL;
+    }
+
+  stack->elements = malloc (capacity * sizeof (void *));
+
+  if (stack->elements == NULL)
+    {
+      free (stack);
+      return NULL;
+    }
 
   return stack;
 }
@@ -79,7 +97,8 @@ array_stack_new (size_t capacity)
 void *
 array_stack_pop (ArrayStack *stack)
 {
-  return stack->elements[stack->size--];
+  assert (stack->size > 0);
+  return stack->elements[--stack->size];
 }
 
 void
@@ -91,7 +110,7 @@ array_stack_push (ArrayStack *stack, void *element)
       array_stack_grow (stack);
     }
 
-  stack->elements[stack->size++] = elem;
+  stack->elements[stack->size++] = element;
 }
 
 size_t
