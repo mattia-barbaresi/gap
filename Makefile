@@ -21,7 +21,7 @@ INCDIR=$(SRCDIR)/include
 BINDIR=$(SRCDIR)/bin
 
 # set this variable to another compiler, or gcc is the default
-CXX = gcc
+CXX = gcc -std=c99
 
 # optimization options
 ifdef DEBUG
