@@ -167,7 +167,7 @@ print_usage ()
   print_short_usage ();
   printf ("\n");
   printf ("Examples:\n");
-  printf ("  gap -f dataset.txt\n");
+  printf ("  gap -i dataset.txt\n");
 }
 
 static void
