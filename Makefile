@@ -8,11 +8,11 @@
 DEBUG=1
 
 # Uncomment this if you don't want to use OPENMP (OPENMP makes the program parallel)
-#NO_OPENMP = 1
+NO_OPENMP=1
 
 # Uncomment this if you don't have SDL installed (SDL is for graphics)
 # SDL is used for the automaton example
-#NO_SDL = 1
+NO_SDL=1
 
 ##################################################
 

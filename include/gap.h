@@ -1,8 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #ifndef _GAP_H
 #define _GAP_H
+
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef char *str;
 
