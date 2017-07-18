@@ -22,7 +22,8 @@
 /**
  * ArrayStack ADT. All the fields are private. You should access them with the proper function.
  */
-typedef struct {
+typedef struct
+{
   void **elements;
   size_t size;
   size_t capacity;
@@ -38,8 +39,7 @@ typedef struct {
  * @param stack the array stack.
  * @return the capacity of the specified array stack.
  */
-size_t
-array_stack_capacity (ArrayStack *stack);
+size_t array_stack_capacity (ArrayStack * stack);
 
 /**
  * @brief Remove all the elements in the stack.
@@ -47,8 +47,7 @@ array_stack_capacity (ArrayStack *stack);
  * @param alist the array list.
  * @param destroy destroyer function.
  */
-void
-array_stack_clear (ArrayStack *stack, Destructor destroy);
+void array_stack_clear (ArrayStack * stack, Destructor destroy);
 
 /**
  * @brief Increase the capacity of an array stack instance, if necessary, to ensure that it can hold at least the number
@@ -60,8 +59,7 @@ array_stack_clear (ArrayStack *stack, Destructor destroy);
  * @param stack the array stack.
  * @param capacity the desired minimum capacity.
  */
-void
-array_stack_ensure_capacity (ArrayStack *stack, size_t capacity);
+void array_stack_ensure_capacity (ArrayStack * stack, size_t capacity);
 
 /**
  * @brief Free the specified array stack instance.
@@ -69,8 +67,7 @@ array_stack_ensure_capacity (ArrayStack *stack, size_t capacity);
  * @param stack the array stack.
  * @param destroy the destroyer function.
  */
-void
-array_stack_free (ArrayStack *stack, Destructor destroy);
+void array_stack_free (ArrayStack * stack, Destructor destroy);
 
 /**
  * @brief Returns TRUE if the array stack is empty (i.e. does not contain any element).
@@ -78,8 +75,7 @@ array_stack_free (ArrayStack *stack, Destructor destroy);
  * @param stack the array stack.
  * @return TRUE if the array stack is empty, FALSE otherwise.
  */
-int
-array_stack_is_empty (ArrayStack *stack);
+int array_stack_is_empty (ArrayStack * stack);
 
 /**
  * @brief Create a new array stack with the specified capacity.
@@ -87,8 +83,7 @@ array_stack_is_empty (ArrayStack *stack);
  * @param capacity The capacity of the new array stack.
  * @return The new array stack.
  */
-ArrayStack *
-array_stack_new (size_t capacity);
+ArrayStack *array_stack_new (size_t capacity);
 
 /**
  * Pop the top element of the stack.
@@ -96,8 +91,7 @@ array_stack_new (size_t capacity);
  * @param stack the array stack.
  * @return the element popped from the stack.
  */
-void *
-array_stack_pop (ArrayStack *stack);
+void *array_stack_pop (ArrayStack * stack);
 
 /**
  * @brief Push the specified element into the stack.
@@ -105,8 +99,7 @@ array_stack_pop (ArrayStack *stack);
  * @param stack the array stack.
  * @param element the element to push into the stack.
  */
-void
-array_stack_push (ArrayStack *stack, void *element);
+void array_stack_push (ArrayStack * stack, void *element);
 
 /**
  * @brief Return the number of elements of the specified array stack.
@@ -116,7 +109,6 @@ array_stack_push (ArrayStack *stack, void *element);
  * @param stack the array stack.
  * @return the number of elements in the specified array stack.
  */
-size_t
-array_stack_size (ArrayStack *stack);
+size_t array_stack_size (ArrayStack * stack);
 
 #endif

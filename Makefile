@@ -49,6 +49,9 @@ endif
 
 all: main
 
+indent: $(SRCDIR/main.c) $(INCDIR)/
+	indent -l120 $(SRCDIR)/main.c $(INCDIR)/*
+
 main: $(SRCDIR)/main.c $(INCDIR)/
 	$(CXX) $(CPPFLAGS)   $(SRCDIR)/main.c -o $(BINDIR)/main $(CXXFLAGS)
 clean:
