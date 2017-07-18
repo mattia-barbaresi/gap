@@ -17,6 +17,8 @@
 
 #include "util.h"
 
+#define ARRAY_STACK_DEFAULT_CAPACITY 16
+
 /**
  * ArrayStack ADT. All the fields are private. You should access them with the proper function.
  */

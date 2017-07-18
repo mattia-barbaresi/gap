@@ -5,7 +5,6 @@
 #include "array_stack.h"
 #include "util.h"
 
-#define ARRAY_STACK_DEFAULT_CAPACITY 16
 #define _ARRAY_STACK_GROW_FACTOR 2
 
 /*
