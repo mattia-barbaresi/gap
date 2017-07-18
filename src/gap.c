@@ -15,21 +15,11 @@
  * along with gap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GAP_H
-#define _GAP_H
-
 #include <stdio.h>
-#include <stdlib.h>
 
-typedef char *str;
-
-typedef struct
-{
-  int **a;
-  int *b;
-  int **c;
-  int n, m;
-} Problem;
+#include "array_stack.h"
+#include "gap.h"
+#include "util.h"
 
 Problem **
 readDataFromFile (str filePath)
@@ -113,5 +103,3 @@ readDataFromFile (str filePath)
 
   return NULL;
 }
-
-#endif

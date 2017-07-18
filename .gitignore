@@ -1,4 +1,10 @@
-bin/
+# Output files
+*.o
+main
+
+# Sublime Text files
 *.sublime-project
 *.sublime-workspace
+
+# GNU Emacs backup files
 *~
