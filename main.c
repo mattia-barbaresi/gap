@@ -106,12 +106,12 @@ main (int argc, char **argv)
 	case 'i':
 	  ifile = optarg;
 	  break;
-        case 't':
-          verbose = TRUE;
-          break;
 	case 'v':
 	  print_version ();
 	  return EXIT_SUCCESS;
+        case 'V':
+          verbose = TRUE;
+          break;
 	default:
           print_error ("invalid option");
 	  print_short_usage ();
