@@ -1,33 +1,21 @@
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# This file is part of gap.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# gap is free software: you can redistribute it and/or modify
+# under the terms of the GNU General Public License as published by
+# Free Software Foundation, either version 3 of the License, or
+# your option) any later version.
+#
+# gap is distributed in the hope that it will be useful,
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# CHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with gap.  If not, see <http://www.gnu.org/licenses/>.
 
-##################################################
-# CONFIGURE THESE VARIABLES
-# or set them on the command line, like:
-#   make main DEBUG=1
-##################################################
-
-#debug enabled
 DEBUG=1
-
-# Uncomment this if you don't want to use OPENMP (OPENMP makes the program parallel)
 NO_OPENMP=1
-
-# Uncomment this if you don't have SDL installed (SDL is for graphics)
-# SDL is used for the automaton example
 NO_SDL=1
-
-##################################################
 
 SRCDIR=.
 INCDIR=$(SRCDIR)/include
