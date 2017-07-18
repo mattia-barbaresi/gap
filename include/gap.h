@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#ifndef _GAP_H
+#define _GAP_H
+
 typedef char *str;
 
 typedef struct
@@ -94,3 +97,5 @@ readDataFromFile (str filePath)
 
   return NULL;
 };
+
+#endif
