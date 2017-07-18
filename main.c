@@ -12,22 +12,22 @@
 /**
  * @brief Print an error message.
  */
-void print_error (char *message);
+static void print_error (char *message);
 
 /**
  * @brief Print short usage message.
  */
-void print_short_usage ();
+static void print_short_usage ();
 
 /**
  * @brief Print usage message.
  */
-void print_usage ();
+static void print_usage ();
 
 /**
  * @brief Print the version
  */
-void print_version ();
+static void print_version ();
 
 //calculate a lower bound for the problem with Lagrangian relaxiation.
 int
