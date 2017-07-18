@@ -26,7 +26,8 @@ calculateLowerBound ()
   t = clock () - t;
 
   printf ("Calculated lower bound in %f seconds.\n", ((double) t) / CLOCKS_PER_SEC);
-  return 0;
+
+  return EXIT_SUCCESS;
 }
 
 //calculate a lower bound for the problem with Lagrangian relaxiation.
