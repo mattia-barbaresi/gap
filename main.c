@@ -15,14 +15,19 @@
  * along with gap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @file main.c
+ * @brief Entry point of the program and command line arguments parsing.
+ */
+
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <unistd.h>
 
 #include "gap.h"
+#include "util.h"
 
 #define VERSION "0.1"
 
@@ -88,9 +93,10 @@ main (int argc, char **argv)
   int c;
   char *ifile = NULL;
   extern char *optarg;
+  int verbose = FALSE;
   Problem **problems;
 
-  while ((c = getopt (argc, argv, "hi:v")) != -1)
+  while ((c = getopt (argc, argv, "hi:vV")) != -1)
     {
       switch (c)
 	{
@@ -100,6 +106,9 @@ main (int argc, char **argv)
 	case 'i':
 	  ifile = optarg;
 	  break;
+        case 't':
+          verbose = TRUE;
+          break;
 	case 'v':
 	  print_version ();
 	  return EXIT_SUCCESS;
@@ -145,6 +154,7 @@ print_short_usage ()
   printf ("  -h         Print this message\n");
   printf ("  -i <file>  Specify the input file\n");
   printf ("  -v         Print program version\n");
+  printf ("  -V         Verbose\n");
 }
 
 static void
