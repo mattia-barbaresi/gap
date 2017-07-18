@@ -119,7 +119,7 @@ main (int argc, char **argv)
 void
 print_error (char *message)
 {
-  fprintf (stderr, "Warning: %s\n", message);
+  fprintf (stderr, "Warning: %s.\n", message);
 }
 
 void
