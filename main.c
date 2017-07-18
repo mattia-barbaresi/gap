@@ -113,7 +113,7 @@ main (int argc, char **argv)
 
   calculateLowerBound ();
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 void
@@ -126,16 +126,17 @@ void
 print_short_usage ()
 {
   printf ("List of options:\n");
-  printf ("  -h          Print this message\n");
-  printf ("  -i <file>   Specify the input file\n");
-  printf ("  -v          Print program version\n");
+  printf ("  -h         Print this message\n");
+  printf ("  -i <file>  Specify the input file\n");
+  printf ("  -v         Print program version\n");
 }
 
 void
 print_usage ()
 {
   printf ("gap %s - Generalized Assignment Problem\n", VERSION);
-  printf ("Copyright Mattia Barbaresi <mattia.barbaresi@gmail.com> and Massimo Neri\n<hello@mneri.me>.\n");
+  printf ("Copyright Mattia Barbaresi <mattia.barbaresi@gmail.com> and Massimo Neri\n");
+  printf ("<hello@mneri.me>, all rights reserved. Licensed under the GNU GPLv3.0.\n");
   printf ("\n");
   print_short_usage ();
   printf ("\n");
