@@ -135,8 +135,8 @@ void
 print_usage ()
 {
   printf ("gap %s - Generalized Assignment Problem\n", VERSION);
-  printf ("Copyright Mattia Barbaresi <mattia.barbaresi@gmail.com> and Massimo Neri\n");
-  printf ("<hello@mneri.me>, all rights reserved. Licensed under the GNU GPLv3.0.\n");
+  printf ("Copyright Mattia Barbaresi and Massimo Neri <hello@mneri.me>, all rights\n");
+  printf ("reserved. Licensed under the GNU GPLv3.0.\n");
   printf ("\n");
   print_short_usage ();
   printf ("\n");
