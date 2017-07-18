@@ -71,7 +71,6 @@ main (int argc, char **argv)
   int c;
   char *ifile = NULL;
   extern char *optarg;
-  extern int optopt;
   Problem **problems;
 
   while ((c = getopt (argc, argv, "hi:v")) != -1)

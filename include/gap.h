@@ -95,6 +95,6 @@ readDataFromFile (str filePath)
     }
 
   return NULL;
-};
+}
 
 #endif

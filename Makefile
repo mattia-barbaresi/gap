@@ -31,7 +31,7 @@ CXXFLAGS += -g -pipe -O3 -march=native -DNDEBUG
 endif
 
 # Correctness options
-CXXFLAGS += -Wall
+CXXFLAGS += -Wall -pedantic
 CPPFLAGS += -I$(SRCDIR) -I$(INCDIR)
 
 
@@ -53,6 +53,6 @@ indent: $(SRCDIR/main.c) $(INCDIR)/
 	indent -l120 $(SRCDIR)/main.c $(INCDIR)/*
 
 main: $(SRCDIR)/main.c $(INCDIR)/
-	$(CXX) $(CPPFLAGS)   $(SRCDIR)/main.c -o $(BINDIR)/main $(CXXFLAGS)
+	$(CXX) $(CPPFLAGS) $(SRCDIR)/main.c -o $(BINDIR)/main $(CXXFLAGS)
 clean:
 	rm -f $(BINDIR)/main
