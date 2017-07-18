@@ -116,13 +116,13 @@ main (int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
-void
+static void
 print_error (char *message)
 {
   fprintf (stderr, "Warning: %s.\n", message);
 }
 
-void
+static void
 print_short_usage ()
 {
   printf ("List of options:\n");
@@ -131,7 +131,7 @@ print_short_usage ()
   printf ("  -v         Print program version\n");
 }
 
-void
+static void
 print_usage ()
 {
   printf ("gap %s - Generalized Assignment Problem\n", VERSION);
@@ -144,7 +144,7 @@ print_usage ()
   printf ("  gap -f dataset.txt\n");
 }
 
-void
+static void
 print_version ()
 {
   printf ("%s\n", VERSION);
