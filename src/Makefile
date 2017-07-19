@@ -21,7 +21,7 @@ FLAGS=-Wall -pedantic
 ifdef DEBUG
 FLAGS+= -pipe -g
 else
-FLAGS+= -g -pipe -O3 -march=native -DNDEBUG
+FLAGS+= -pipe -O3 -march=native -DNDEBUG
 endif
 
 all: array_stack.o gap.o main.o util.o
