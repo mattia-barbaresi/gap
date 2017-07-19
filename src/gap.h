@@ -31,6 +31,10 @@ typedef struct
   int n, m;
 } Problem;
 
+int calculateLowerBound ();
+
+int branchAndBound ();
+
 Problem **readDataFromFile (str filePath);
 
 #endif

@@ -23,7 +23,6 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 
 #include "gap.h"
@@ -50,42 +49,6 @@ static void print_usage ();
  * @brief Print the version
  */
 static void print_version ();
-
-//calculate a lower bound for the problem with Lagrangian relaxiation.
-int
-calculateLowerBound ()
-{
-  clock_t t;
-
-  printf ("Calculating lower bound....\n");
-  t = clock ();
-
-  //calcolo L(u) : rilassamento lagrangiano
-  //il duale di L(u) definito come Max [ L(u)], u >= 0 -> LOWER BOUND
-  //per risolvere il duale lagrangiano posso usare metodo del subgradiente
-
-  t = clock () - t;
-
-  printf ("Calculated lower bound in %f seconds.\n", ((double) t) / CLOCKS_PER_SEC);
-
-  return 0;
-}
-
-//calculate a lower bound for the problem with Lagrangian relaxiation.
-int
-branchAndBound ()
-{
-  clock_t t;
-  printf ("Executing branch-and-bound....\n");
-  //init time
-  t = clock ();
-
-  //end time
-  t = clock () - t;
-
-  printf ("Branch-and-bound executed in %f seconds.\n", ((double) t) / CLOCKS_PER_SEC);
-  return 0;
-}
 
 int
 main (int argc, char **argv)
@@ -126,7 +89,11 @@ main (int argc, char **argv)
       return EXIT_FAILURE;
     }
 
-  problems = readDataFromFile (ifile);
+  if ((problems = readDataFromFile (ifile)) == NULL)
+    {
+      perror ("Error");
+      return EXIT_FAILURE;
+    }
 
   int m = problems[0]->m;
   int n = problems[0]->n;
@@ -144,7 +111,7 @@ main (int argc, char **argv)
 static void
 print_error (char *message)
 {
-  fprintf (stderr, "Warning: %s.\n", message);
+  fprintf (stderr, "Error: %s\n", message);
 }
 
 static void
@@ -168,6 +135,7 @@ print_usage ()
   printf ("\n");
   printf ("Examples:\n");
   printf ("  gap -i dataset.txt\n");
+  printf ("  gap -i dataset.txt -V\n");
 }
 
 static void
