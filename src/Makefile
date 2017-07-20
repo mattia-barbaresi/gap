@@ -24,22 +24,25 @@ else
 FLAGS+= -pipe -O3 -march=native -DNDEBUG
 endif
 
-all: array_stack.o gap.o main.o util.o
-	$(CC) $(FLAGS) array_stack.o gap.o main.o util.o -o main
+all: array_list.o array_stack.o gap.o main.o util.o
+	$(CC) $(FLAGS) array_list.o array_stack.o gap.o main.o util.o -o main
+
+array_list.o: array_list.h array_list.c util.h
+	$(CC) $(FLAGS) array_list.c -c -o array_list.o
 
 array_stack.o: array_stack.h array_stack.c util.h
 	$(CC) $(FLAGS) array_stack.c -c -o array_stack.o
 
 clean:
-	rm *.o main
+	rm -f *.o main
 
-gap.o: array_stack.h gap.h gap.c util.h
+gap.o: array_list.h array_stack.h gap.h gap.c util.h
 	$(CC) $(FLAGS) gap.c -c -o gap.o
 
 indent:
 	indent -l120 *.h *.c
 
-main.o: gap.h main.c util.h
+main.o: array_list.h gap.h main.c util.h
 	$(CC) $(FLAGS) main.c -c -o main.o
 
 util.o: util.h util.c
