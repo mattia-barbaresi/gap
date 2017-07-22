@@ -24,18 +24,18 @@
 
 #define _ARRAY_STACK_GROW_FACTOR 2
 
+extern inline size_t array_stack_capacity (ArrayStack * stack);
+
+extern inline int array_stack_is_empty (ArrayStack * stack);
+
+extern inline size_t array_stack_size (ArrayStack * stack);
+
 /*
  * Enlarge the backing array of the specified array stack.
  *
  * @param stack the array stack.
  */
 static void array_stack_grow (ArrayStack * stack);
-
-size_t
-array_stack_capacity (ArrayStack * stack)
-{
-  return stack->capacity;
-}
 
 void
 array_stack_clear (ArrayStack * stack, Destructor destroy)
@@ -73,13 +73,7 @@ array_stack_free (ArrayStack * stack, Destructor destroy)
 static void
 array_stack_grow (ArrayStack * stack)
 {
-  array_stack_ensure_capacity (stack, array_stack_capacity (stack) * _ARRAY_STACK_GROW_FACTOR);
-}
-
-int
-array_stack_is_empty (ArrayStack * stack)
-{
-  return stack->size == 0;
+  array_stack_ensure_capacity (stack, stack->capacity * _ARRAY_STACK_GROW_FACTOR);
 }
 
 ArrayStack *
@@ -126,10 +120,4 @@ array_stack_push (ArrayStack * stack, void *element)
     }
 
   stack->elements[stack->size++] = element;
-}
-
-size_t
-array_stack_size (ArrayStack * stack)
-{
-  return stack->size;
 }
