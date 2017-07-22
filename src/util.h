@@ -44,4 +44,16 @@
  */
 typedef void (*Destructor) (void *element);
 
+/**
+ * @brief A comparator is a function used to compare objects.
+ *
+ * @param one element to compare.
+ * @param other element to compare.
+ * @return A number less than, equal to or greater than 0 in case the first parameter is less than, equal to or greater
+ *         than the second.
+ */
+typedef int (*Comparator) (void *one, void *other);
+
+typedef int (*HashFunction) (void *element);
+
 #endif
