@@ -85,9 +85,8 @@ void array_stack_ensure_capacity (ArrayStack * stack, size_t capacity);
  * @brief Free the specified array stack instance.
  *
  * @param stack the array stack.
- * @param destroy the destroyer function.
  */
-void array_stack_free (ArrayStack * stack, Destructor destroy);
+void array_stack_free (ArrayStack * stack);
 
 /**
  * @brief Returns TRUE if the array stack is empty (i.e. does not contain any element).

@@ -63,7 +63,7 @@ array_stack_ensure_capacity (ArrayStack * stack, size_t capacity)
 }
 
 void
-array_stack_free (ArrayStack * stack, Destructor destroy)
+array_stack_free (ArrayStack * stack)
 {
   free (stack->elements);
   free (stack);

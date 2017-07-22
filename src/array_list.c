@@ -87,7 +87,7 @@ array_list_ensure_capacity (ArrayList * list, size_t capacity)
     }
 }
 
-void array_list_free (ArrayList * list, Destructor destroy)
+void array_list_free (ArrayList * list)
 {
   free (list->elements);
   free (list);

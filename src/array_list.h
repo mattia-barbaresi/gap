@@ -104,9 +104,8 @@ void array_list_ensure_capacity (ArrayList * list, size_t capacity);
  * @brief Free the specified array list instance.
  *
  * @param list the array list.
- * @param destroy the destroyer function.
  */
-void array_list_free (ArrayList * list, Destructor destroyer);
+void array_list_free (ArrayList * list);
 
 /**
  * @brief Return the element at the specified position in the array list.
