@@ -74,7 +74,8 @@ void array_list_add_all (ArrayList * list, void **elems, size_t size);
  * @param list the array list.
  * @return the capacity of the specified array list.
  */
-inline size_t array_list_capacity (ArrayList * list)
+inline size_t
+array_list_capacity (ArrayList * list)
 {
   return list->capacity;
 }
@@ -114,7 +115,8 @@ void array_list_free (ArrayList * list);
  * @param pos the position of the element.
  * @return the element at the specified position in the array list.
  */
-inline void *array_list_get (ArrayList * list, unsigned int pos)
+inline void *
+array_list_get (ArrayList * list, unsigned int pos)
 {
   assert (pos < list->size);
   return list->elements[pos];
@@ -126,7 +128,8 @@ inline void *array_list_get (ArrayList * list, unsigned int pos)
  * @param list the array list.
  * @return TRUE if the array list is empty, FALSE otherwise.
  */
-inline int array_list_is_empty (ArrayList * list)
+inline int
+array_list_is_empty (ArrayList * list)
 {
   return list->size == 0;
 }
@@ -168,7 +171,8 @@ void array_list_set (ArrayList * list, void *elem, unsigned int pos);
  * @param list the array list.
  * @return the number of elements in the specified array list.
  */
-inline size_t array_list_size (ArrayList * list)
+inline size_t
+array_list_size (ArrayList * list)
 {
   return list->size;
 }

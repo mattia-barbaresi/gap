@@ -25,7 +25,7 @@
 
 //calculate a lower bound for the problem with Lagrangian relaxiation.
 int
-calculateLowerBound ()
+gap_calculate_lower_bound ()
 {
   clock_t t;
 
@@ -45,7 +45,7 @@ calculateLowerBound ()
 
 //calculate a lower bound for the problem with Lagrangian relaxiation.
 int
-branchAndBound ()
+gap_branch_and_bound ()
 {
   clock_t t;
   printf ("Executing branch-and-bound....\n");
@@ -60,7 +60,7 @@ branchAndBound ()
 }
 
 Problem **
-readDataFromFile (str filePath)
+gap_read_data_from_file (str filePath, int* numProblems)
 {
   FILE *pFile = fopen (filePath, "r");
 
@@ -68,14 +68,13 @@ readDataFromFile (str filePath)
     return NULL;
 
   Problem **problems;
-  int numProblems = 0;
   int n, m, q;
 
-  fscanf (pFile, "%d", &numProblems);
+  fscanf (pFile, "%d", numProblems);
 
-  problems = malloc (numProblems * sizeof (Problem *));
+  problems = malloc (*numProblems * sizeof (Problem *));
 
-  for (int p = 0; p < numProblems; ++p)
+  for (int p = 0; p < *numProblems; ++p)
     {
       printf ("read problem %d...\n", p);
       problems[p] = (Problem *) malloc (sizeof (Problem));
@@ -98,11 +97,20 @@ readDataFromFile (str filePath)
       //init b
       problems[p]->b = malloc (m * sizeof (int));
 
+      //init b
+      problems[p]->u = calloc (sizeof (int), m);
+
       //init c
       problems[p]->c = malloc (m * sizeof (int *));
       problems[p]->c[0] = malloc (m * n * sizeof (int));
       for (q = 1; q < m; q++)
         problems[p]->c[q] = problems[p]->c[0] + q * n;
+
+      //init x
+      problems[p]->x = malloc (m * sizeof (int *));
+      problems[p]->x[0] = calloc (sizeof (int), m * n);
+      for (q = 1; q < m; q++)
+        problems[p]->x[q] = problems[p]->x[0] + q * n;
 
       int i, j;
 
@@ -134,4 +142,87 @@ readDataFromFile (str filePath)
   printf ("Data readed from file %s.\n", filePath);
 
   return problems;
+}
+
+//calculates total cost
+int gap_calculate_solution(Problem problem)
+{
+
+  int cost=0;
+
+  for (int i = 0; i < problem.m; ++i)
+  {
+    for (int j = 0; j < problem.n; ++j)
+    {
+      cost += problem.c[i][j] * problem.x[i][j];
+    }
+  }
+  return cost;
+}
+
+int
+gap_calcuate_lagrangian_function (Problem problem)
+{
+  int n = problem.n;
+  int m = problem.m;
+
+  //init result matrix
+  int result =  gap_calculate_solution(problem);
+
+  int* u = calloc (sizeof(int), m);
+  int sum;
+
+  for (int i = 0; i < m; ++i)
+  {
+    sum = 0;
+    for (int j = 0; j < n; ++j)
+    {
+      sum += problem.c[i][j];
+    }
+
+    sum -= problem.b[i];
+    result -= sum * u[i];
+  }
+  return result;
+}
+
+int**
+gap_calculate_initial (Problem problem)
+{
+  int** res = malloc (problem.m * sizeof (int *));
+  int q;
+  res[0] = calloc(sizeof(int), problem.n * problem.m);
+  for (q = 1; q < problem.m; q++)
+    res[q] = res[0] + q * problem.n;
+
+  int minIndex;
+  int minValue;
+
+  //set to 1 variables that have min cost
+  for (int i = 0; i < problem.m; ++i)
+  {
+    minIndex = 0;
+    minValue = problem.c[i][0];
+
+    for (int j = 0; j< problem.n; ++j)
+    {
+      if(problem.c[i][j] < minValue)
+      {
+        minIndex = j;
+        minValue = problem.c[i][j];
+      }
+    }
+
+    res[i][minIndex] = 1;
+  }
+
+  for (int i = 0; i < problem.m; ++i)
+  {
+    printf("\n");
+    for (int j = 0; j < problem.n; ++j)
+    {
+      printf("%d ", res[i][j]);
+    }
+  }
+  return res;
 }

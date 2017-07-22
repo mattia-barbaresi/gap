@@ -50,63 +50,6 @@ static void print_usage ();
  */
 static void print_version ();
 
-int
-main (int argc, char **argv)
-{
-  int c;
-  char *ifile = NULL;
-  extern char *optarg;
-  int verbose = FALSE;
-  Problem **problems;
-
-  while ((c = getopt (argc, argv, "hi:vV")) != -1)
-    {
-      switch (c)
-	{
-	case 'h':
-	  print_usage ();
-	  return EXIT_SUCCESS;
-	case 'i':
-	  ifile = optarg;
-	  break;
-	case 'v':
-	  print_version ();
-	  return EXIT_SUCCESS;
-        case 'V':
-          verbose = TRUE;
-          break;
-	default:
-          print_error ("invalid option");
-	  print_short_usage ();
-	  return EXIT_FAILURE;
-	}
-    }
-
-  if (ifile == NULL)
-    {
-      print_error ("no input file");
-      print_short_usage ();
-      return EXIT_FAILURE;
-    }
-
-  if ((problems = readDataFromFile (ifile)) == NULL)
-    {
-      perror ("Error");
-      return EXIT_FAILURE;
-    }
-
-  int m = problems[0]->m;
-  int n = problems[0]->n;
-  printf ("prova elemento prob(0)->m: %d\n", m);
-  printf ("prova elemento prob(0)->n: %d\n", problems[0]->n);
-  printf ("prova elemento prob(0)->a[m][n]: %d\n", problems[0]->a[m - 1][n - 1]);
-  printf ("prova elemento prob(0)->b[m]: %d\n", problems[0]->b[m - 1]);
-  printf ("prova elemento prob(0)->c[m][n]: %d\n", problems[0]->c[m - 1][n - 1]);
-
-  calculateLowerBound ();
-
-  return EXIT_SUCCESS;
-}
 
 static void
 print_error (char *message)
@@ -142,4 +85,64 @@ static void
 print_version ()
 {
   printf ("%s\n", VERSION);
+}
+
+int
+main (int argc, char **argv)
+{
+  int c;
+  char *ifile = NULL;
+  extern char *optarg;
+  int verbose = FALSE;
+  Problem **problems;
+  int numProblems = 0;
+
+  while ((c = getopt (argc, argv, "hi:vV")) != -1)
+    {
+      switch (c)
+	{
+	case 'h':
+	  print_usage ();
+	  return EXIT_SUCCESS;
+	case 'i':
+	  ifile = optarg;
+	  break;
+	case 'v':
+	  print_version ();
+	  return EXIT_SUCCESS;
+	case 'V':
+	  verbose = TRUE;
+	  break;
+	default:
+	  print_error ("invalid option");
+	  print_short_usage ();
+	  return EXIT_FAILURE;
+	}
+    }
+
+  if (ifile == NULL)
+    {
+      print_error ("no input file");
+      print_short_usage ();
+      return EXIT_FAILURE;
+    }
+
+  if ((problems = gap_read_data_from_file (ifile, &numProblems)) == NULL)
+    {
+      perror ("Error");
+      return EXIT_FAILURE;
+    }
+
+  for (int i = 0; i < numProblems; ++i)
+    {
+      /* code */
+      int sol = gap_calcuate_lagrangian_function(*(problems[i]));
+      printf("valore soluzione lagrnagiana: %d\n",sol );
+      gap_calculate_lower_bound ();
+    }
+
+    gap_calculate_initial(*(problems[0]));
+
+
+  return EXIT_SUCCESS;
 }

@@ -56,7 +56,8 @@ typedef struct
  * @param stack the array stack.
  * @return the capacity of the specified array stack.
  */
-inline size_t array_stack_capacity (ArrayStack * stack)
+inline size_t
+array_stack_capacity (ArrayStack * stack)
 {
   return stack->capacity;
 }
@@ -94,7 +95,8 @@ void array_stack_free (ArrayStack * stack);
  * @param stack the array stack.
  * @return TRUE if the array stack is empty, FALSE otherwise.
  */
-inline int array_stack_is_empty (ArrayStack * stack)
+inline int
+array_stack_is_empty (ArrayStack * stack)
 {
   return stack->size == 0;
 }
@@ -131,7 +133,8 @@ void array_stack_push (ArrayStack * stack, void *element);
  * @param stack the array stack.
  * @return the number of elements in the specified array stack.
  */
-inline size_t array_stack_size (ArrayStack * stack)
+inline size_t
+array_stack_size (ArrayStack * stack)
 {
   return stack->size;
 }
