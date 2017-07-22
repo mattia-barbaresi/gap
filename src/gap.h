@@ -26,15 +26,27 @@ typedef char *str;
 typedef struct
 {
   int **a;
-  int *b;
   int **c;
+  int **x;
+  int *b;
+  int *u;
   int n, m;
 } Problem;
 
-int calculateLowerBound ();
+//calculates the value of the lagrangian function
+int gap_calcuate_lagrangian_function (Problem problem);
 
-int branchAndBound ();
+int gap_calculate_lower_bound ();
 
-Problem **readDataFromFile (str filePath);
+int gap_branch_and_bound ();
+
+//calculates the value of the objective function
+int gap_calculate_solution (Problem problem);
+
+//reads data from file and inits structures
+Problem **gap_read_data_from_file (str filePath, int *numP);
+
+//calculates initial solution for first relaxation
+int** gap_calculate_initial (Problem problem);
 
 #endif
