@@ -89,7 +89,6 @@ array_list_ensure_capacity (ArrayList * list, size_t capacity)
 
 void array_list_free (ArrayList * list, Destructor destroy)
 {
-  array_list_clear (list, destroy);
   free (list->elements);
   free (list);
 }
