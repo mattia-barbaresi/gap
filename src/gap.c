@@ -252,10 +252,10 @@ gap_problems_from_file (char *fname)
   FILE *fp;
   int i;
   int j;
+  int k;
   int m;
   int n;
   int n_problems;
-  int p;
   Problem *problem;
   ArrayList *problems;
 
@@ -269,7 +269,7 @@ gap_problems_from_file (char *fname)
   fscanf (fp, "%d", &n_problems);
   problems = array_list_new (n_problems);
 
-  for (p = 0; p < n_problems; p++)
+  for (k = 0; k < n_problems; k++)
     {
       fscanf (fp, "%d", &m);
       fscanf (fp, "%d", &n);
