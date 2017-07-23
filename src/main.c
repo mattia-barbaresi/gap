@@ -92,6 +92,7 @@ int
 main (int argc, char **argv)
 {
   int c;
+  int i;
   char *ifile = NULL;
   ArrayList *problems;
   extern char *optarg;
@@ -128,18 +129,16 @@ main (int argc, char **argv)
       return EXIT_FAILURE;
     }
 
-  if ((problems = gap_read_data_from_file (ifile)) == NULL)
+  if ((problems = gap_problems_from_file (ifile)) == NULL)
     {
       perror (ERROR_PREFIX);
       return EXIT_FAILURE;
     }
 
-  for (int i = 0; i < array_list_size (problems); ++i)
+  for (i = 0; i < array_list_size (problems); i++)
     {
-      /* code */
       int sol = gap_calcuate_lagrangian_function (*((Problem *) array_list_get (problems, i)));
       printf ("valore soluzione lagrnagiana: %d\n", sol);
-      gap_calculate_lower_bound ();
     }
 
   gap_calculate_initial (*((Problem *) array_list_get (problems, 0)));

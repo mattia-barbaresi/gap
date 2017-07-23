@@ -26,21 +26,11 @@
 
 //calculate a lower bound for the problem with Lagrangian relaxiation.
 int
-gap_calculate_lower_bound ()
+gap_lower_bound ()
 {
-  clock_t t;
-
-  printf ("Calculating lower bound....\n");
-  t = clock ();
-
   //calcolo L(u) : rilassamento lagrangiano
   //il duale di L(u) definito come Max [ L(u)], u >= 0 -> LOWER BOUND
   //per risolvere il duale lagrangiano posso usare metodo del subgradiente
-
-  t = clock () - t;
-
-  printf ("Calculated lower bound in %f seconds.\n", ((double) t) / CLOCKS_PER_SEC);
-
   return 0;
 }
 
@@ -48,74 +38,7 @@ gap_calculate_lower_bound ()
 int
 gap_branch_and_bound ()
 {
-  clock_t t;
-  printf ("Executing branch-and-bound....\n");
-  //init time
-  t = clock ();
-
-  //end time
-  t = clock () - t;
-
-  printf ("Branch-and-bound executed in %f seconds.\n", ((double) t) / CLOCKS_PER_SEC);
   return 0;
-}
-
-ArrayList *
-gap_read_data_from_file (char *fname)
-{
-  FILE *fp;
-  int i;
-  int j;
-  int m;
-  int n;
-  int n_problems;
-  int p;
-  Problem *problem;
-  ArrayList *problems;
-
-  fp = fopen (fname, "r");
-
-  if (fp == NULL)
-    {
-      return NULL;
-    }
-
-  fscanf (fp, "%d", &n_problems);
-  problems = array_list_new (n_problems);
-
-  for (p = 0; p < n_problems; p++)
-    {
-      fscanf (fp, "%d", &m);
-      fscanf (fp, "%d", &n);
-      problem = gap_problem_new (m, n);
-
-      for (i = 0; i < m; i++)
-	{
-	  for (j = 0; j < n; j++)
-	    {
-	      fscanf (fp, "%d", &(problem->c[i][j]));
-	    }
-	}
-
-      for (i = 0; i < m; i++)
-	{
-	  for (j = 0; j < n; j++)
-	    {
-	      fscanf (fp, "%d", &(problem->a[i][j]));
-	    }
-	}
-
-      for (i = 0; i < m; i++)
-	{
-	  fscanf (fp, "%d", &(problem->b[i]));
-	}
-
-      array_list_add (problems, problem);
-    }
-
-  fclose (fp);
-
-  return problems;
 }
 
 //calculates total cost
@@ -123,14 +46,17 @@ int
 gap_calculate_solution (Problem problem)
 {
   int cost = 0;
+  int i;
+  int j;
 
-  for (int i = 0; i < problem.m; ++i)
+  for (i = 0; i < problem.m; ++i)
     {
-      for (int j = 0; j < problem.n; ++j)
+      for (j = 0; j < problem.n; ++j)
 	{
 	  cost += problem.c[i][j] * problem.x[i][j];
 	}
     }
+
   return cost;
 }
 
@@ -149,6 +75,7 @@ gap_calcuate_lagrangian_function (Problem problem)
   for (int i = 0; i < m; ++i)
     {
       sum = 0;
+
       for (int j = 0; j < n; ++j)
 	{
 	  sum += problem.c[i][j];
@@ -157,6 +84,7 @@ gap_calcuate_lagrangian_function (Problem problem)
       sum -= problem.b[i];
       result -= sum * u[i];
     }
+
   return result;
 }
 
@@ -316,4 +244,62 @@ gap_problem_print (Problem * problem)
 	  printf ("%d%s", problem->x[i][j], (j < (problem->n - 1) ? " " : "\n"));
 	}
     }
+}
+
+ArrayList *
+gap_problems_from_file (char *fname)
+{
+  FILE *fp;
+  int i;
+  int j;
+  int m;
+  int n;
+  int n_problems;
+  int p;
+  Problem *problem;
+  ArrayList *problems;
+
+  fp = fopen (fname, "r");
+
+  if (fp == NULL)
+    {
+      return NULL;
+    }
+
+  fscanf (fp, "%d", &n_problems);
+  problems = array_list_new (n_problems);
+
+  for (p = 0; p < n_problems; p++)
+    {
+      fscanf (fp, "%d", &m);
+      fscanf (fp, "%d", &n);
+      problem = gap_problem_new (m, n);
+
+      for (i = 0; i < m; i++)
+	{
+	  for (j = 0; j < n; j++)
+	    {
+	      fscanf (fp, "%d", &(problem->c[i][j]));
+	    }
+	}
+
+      for (i = 0; i < m; i++)
+	{
+	  for (j = 0; j < n; j++)
+	    {
+	      fscanf (fp, "%d", &(problem->a[i][j]));
+	    }
+	}
+
+      for (i = 0; i < m; i++)
+	{
+	  fscanf (fp, "%d", &(problem->b[i]));
+	}
+
+      array_list_add (problems, problem);
+    }
+
+  fclose (fp);
+
+  return problems;
 }
