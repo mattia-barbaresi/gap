@@ -39,13 +39,13 @@ int gap_branch_and_bound ();
 int gap_lower_bound ();
 
 //calculates the value of the lagrangian function
-int gap_calcuate_lagrangian_function (Problem problem);
+int gap_calcuate_lagrangian_function (Problem * problem);
 
 //calculates initial solution for first relaxation
-int **gap_calculate_initial (Problem problem);
+int **gap_calculate_initial (Problem * problem);
 
 //calculates the value of the objective function
-int gap_calculate_solution (Problem problem);
+int gap_calculate_solution (Problem * problem);
 
 //reads data from file and inits structures
 ArrayList *gap_problems_from_file (char *fname);

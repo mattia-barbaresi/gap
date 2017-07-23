@@ -43,17 +43,17 @@ gap_branch_and_bound ()
 
 //calculates total cost
 int
-gap_calculate_solution (Problem problem)
+gap_calculate_solution (Problem * problem)
 {
   int cost = 0;
   int i;
   int j;
 
-  for (i = 0; i < problem.m; ++i)
+  for (i = 0; i < problem->m; i++)
     {
-      for (j = 0; j < problem.n; ++j)
+      for (j = 0; j < problem->n; j++)
 	{
-	  cost += problem.c[i][j] * problem.x[i][j];
+	  cost += problem->c[i][j] * problem->x[i][j];
 	}
     }
 
@@ -61,71 +61,80 @@ gap_calculate_solution (Problem problem)
 }
 
 int
-gap_calcuate_lagrangian_function (Problem problem)
+gap_calcuate_lagrangian_function (Problem * problem)
 {
-  int n = problem.n;
-  int m = problem.m;
+  int i;
+  int j;
+  int result;
+  int sum;
+  int *u;
 
   //init result matrix
-  int result = gap_calculate_solution (problem);
+  result = gap_calculate_solution (problem);
+  u = calloc (problem->m, sizeof (int));
 
-  int *u = calloc (sizeof (int), m);
-  int sum;
-
-  for (int i = 0; i < m; ++i)
+  for (i = 0; i < problem->m; i++)
     {
       sum = 0;
 
-      for (int j = 0; j < n; ++j)
+      for (j = 0; j < problem->n; j++)
 	{
-	  sum += problem.c[i][j];
+	  sum += problem->c[i][j];
 	}
 
-      sum -= problem.b[i];
+      sum -= problem->b[i];
       result -= sum * u[i];
     }
+
+  free (u);
 
   return result;
 }
 
 int **
-gap_calculate_initial (Problem problem)
+gap_calculate_initial (Problem * problem)
 {
-  int **res = malloc (problem.m * sizeof (int *));
-  int q;
-  res[0] = calloc (sizeof (int), problem.n * problem.m);
-  for (q = 1; q < problem.m; q++)
-    res[q] = res[0] + q * problem.n;
-
+  int i;
+  int j;
   int minIndex;
   int minValue;
+  int q;
+  int **res;
+
+  res = malloc (problem->m * sizeof (int *));
+  res[0] = calloc (problem->n * problem->m, sizeof (int));
+
+  for (q = 1; q < problem->m; q++)
+    res[q] = res[0] + q * problem->n;
 
   //set to 1 variables that have min cost
-  for (int i = 0; i < problem.m; ++i)
+  for (i = 0; i < problem->m; i++)
     {
       minIndex = 0;
-      minValue = problem.c[i][0];
+      minValue = problem->c[i][0];
 
-      for (int j = 0; j < problem.n; ++j)
+      for (j = 0; j < problem->n; j++)
 	{
-	  if (problem.c[i][j] < minValue)
+	  if (problem->c[i][j] < minValue)
 	    {
 	      minIndex = j;
-	      minValue = problem.c[i][j];
+	      minValue = problem->c[i][j];
 	    }
 	}
 
       res[i][minIndex] = 1;
     }
 
-  for (int i = 0; i < problem.m; ++i)
+  for (i = 0; i < problem->m; i++)
     {
       printf ("\n");
-      for (int j = 0; j < problem.n; ++j)
+
+      for (j = 0; j < problem->n; j++)
 	{
 	  printf ("%d ", res[i][j]);
 	}
     }
+
   return res;
 }
 
@@ -259,21 +268,30 @@ gap_problems_from_file (char *fname)
   Problem *problem;
   ArrayList *problems;
 
-  fp = fopen (fname, "r");
-
-  if (fp == NULL)
+  if ((fp = fopen (fname, "r")) == NULL)
     {
       return NULL;
     }
 
   fscanf (fp, "%d", &n_problems);
-  problems = array_list_new (n_problems);
+
+  if ((problems = array_list_new (n_problems)) == NULL)
+    {
+      return NULL;
+    }
 
   for (k = 0; k < n_problems; k++)
     {
       fscanf (fp, "%d", &m);
       fscanf (fp, "%d", &n);
-      problem = gap_problem_new (m, n);
+
+      if ((problem = gap_problem_new (m, n)) == NULL)
+        {
+          array_list_clear (problems, (Destructor) gap_problem_free);
+          array_list_free (problems);
+
+          return NULL;
+        }
 
       for (i = 0; i < m; i++)
 	{
@@ -299,7 +317,13 @@ gap_problems_from_file (char *fname)
       array_list_add (problems, problem);
     }
 
-  fclose (fp);
+  if (fclose (fp) == EOF)
+    {
+      array_list_clear (problems, (Destructor) gap_problem_free);
+      array_list_free (problems);
+
+      return NULL;
+    }
 
   return problems;
 }
