@@ -143,8 +143,7 @@ main (int argc, char **argv)
       gap_calculate_lower_bound ();
     }
 
-    gap_calculate_initial(*(problems[0]));
-
+  gap_calculate_initial(*(problems[0]));
 
   return EXIT_SUCCESS;
 }
