@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "array_list.h"
+
 typedef char *str;
 
 typedef struct
@@ -44,9 +46,15 @@ int gap_branch_and_bound ();
 int gap_calculate_solution (Problem problem);
 
 //reads data from file and inits structures
-Problem **gap_read_data_from_file (str filePath, int *numP);
+ArrayList *gap_read_data_from_file (char *fname);
 
 //calculates initial solution for first relaxation
-int** gap_calculate_initial (Problem problem);
+int **gap_calculate_initial (Problem problem);
+
+void gap_problem_free (Problem * problem);
+
+Problem *gap_problem_new (int m, int n);
+
+void gap_problem_print (Problem * problem);
 
 #endif

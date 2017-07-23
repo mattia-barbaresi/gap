@@ -93,10 +93,9 @@ main (int argc, char **argv)
 {
   int c;
   char *ifile = NULL;
+  ArrayList *problems;
   extern char *optarg;
   int verbose = FALSE;
-  Problem **problems;
-  int numProblems = 0;
 
   while ((c = getopt (argc, argv, "hi:vV")) != -1)
     {
@@ -112,7 +111,7 @@ main (int argc, char **argv)
 	  print_version ();
 	  return EXIT_SUCCESS;
 	case 'V':
-          /* Verbose means print statistics like time spent finding the solution. */
+	  /* Verbose means print statistics like time spent finding the solution. */
 	  verbose = TRUE;
 	  break;
 	default:
@@ -129,21 +128,24 @@ main (int argc, char **argv)
       return EXIT_FAILURE;
     }
 
-  if ((problems = gap_read_data_from_file (ifile, &numProblems)) == NULL)
+  if ((problems = gap_read_data_from_file (ifile)) == NULL)
     {
       perror (ERROR_PREFIX);
       return EXIT_FAILURE;
     }
 
-  for (int i = 0; i < numProblems; ++i)
+  for (int i = 0; i < array_list_size (problems); ++i)
     {
       /* code */
-      int sol = gap_calcuate_lagrangian_function(*(problems[i]));
-      printf("valore soluzione lagrnagiana: %d\n",sol );
+      int sol = gap_calcuate_lagrangian_function (*((Problem *) array_list_get (problems, i)));
+      printf ("valore soluzione lagrnagiana: %d\n", sol);
       gap_calculate_lower_bound ();
     }
 
-  gap_calculate_initial(*(problems[0]));
+  gap_calculate_initial (*((Problem *) array_list_get (problems, 0)));
+
+  array_list_clear (problems, (Destructor) gap_problem_free);
+  array_list_free (problems);
 
   return EXIT_SUCCESS;
 }

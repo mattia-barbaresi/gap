@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "array_list.h"
 #include "array_stack.h"
 #include "gap.h"
 #include "util.h"
@@ -59,104 +60,77 @@ gap_branch_and_bound ()
   return 0;
 }
 
-Problem **
-gap_read_data_from_file (str filePath, int* numProblems)
+ArrayList *
+gap_read_data_from_file (char *fname)
 {
-  FILE *pFile = fopen (filePath, "r");
+  FILE *fp;
+  int i;
+  int j;
+  int m;
+  int n;
+  int n_problems;
+  int p;
+  Problem *problem;
+  ArrayList *problems;
 
-  if (pFile == NULL)
-    return NULL;
+  fp = fopen (fname, "r");
 
-  Problem **problems;
-  int n, m, q;
-
-  fscanf (pFile, "%d", numProblems);
-
-  problems = malloc (*numProblems * sizeof (Problem *));
-
-  for (int p = 0; p < *numProblems; ++p)
+  if (fp == NULL)
     {
-      printf ("read problem %d...\n", p);
-      problems[p] = (Problem *) malloc (sizeof (Problem));
-      //read problem instance
-
-      //read # containers
-      fscanf (pFile, "%d", &m);
-      //read # itemsw
-      fscanf (pFile, "%d", &n);
-
-      problems[p]->m = m;
-      problems[p]->n = n;
-
-      //init a
-      problems[p]->a = malloc (m * sizeof (int *));
-      problems[p]->a[0] = malloc (m * n * sizeof (int));
-      for (q = 1; q < m; q++)
-        problems[p]->a[q] = problems[p]->a[0] + q * n;
-
-      //init b
-      problems[p]->b = malloc (m * sizeof (int));
-
-      //init b
-      problems[p]->u = calloc (sizeof (int), m);
-
-      //init c
-      problems[p]->c = malloc (m * sizeof (int *));
-      problems[p]->c[0] = malloc (m * n * sizeof (int));
-      for (q = 1; q < m; q++)
-        problems[p]->c[q] = problems[p]->c[0] + q * n;
-
-      //init x
-      problems[p]->x = malloc (m * sizeof (int *));
-      problems[p]->x[0] = calloc (sizeof (int), m * n);
-      for (q = 1; q < m; q++)
-        problems[p]->x[q] = problems[p]->x[0] + q * n;
-
-      int i, j;
-
-      //read c[m][n]
-      //foreach container
-      for (i = 0; i < m; ++i)
-        for (j = 0; j < n; ++j)
-          {
-            //read cost of assign item j to container i
-            fscanf (pFile, "%d", &(problems[p]->c[i][j]));
-          }
-
-      //read a[m][n]
-      //foreach container
-      for (i = 0; i < m; ++i)
-        for (j = 0; j < n; ++j)
-          //read space of item j in container i
-          fscanf (pFile, "%d", &(problems[p]->a[i][j]));
-
-      //read b
-      //foreach container
-      for (i = 0; i < m; ++i)
-        //read total space of container i
-        fscanf (pFile, "%d", &(problems[p]->b[i]));
-
+      return NULL;
     }
 
-  fclose (pFile);
-  printf ("Data readed from file %s.\n", filePath);
+  fscanf (fp, "%d", &n_problems);
+  problems = array_list_new (n_problems);
+
+  for (p = 0; p < n_problems; p++)
+    {
+      fscanf (fp, "%d", &m);
+      fscanf (fp, "%d", &n);
+      problem = gap_problem_new (m, n);
+
+      for (i = 0; i < m; i++)
+	{
+	  for (j = 0; j < n; j++)
+	    {
+	      fscanf (fp, "%d", &(problem->c[i][j]));
+	    }
+	}
+
+      for (i = 0; i < m; i++)
+	{
+	  for (j = 0; j < n; j++)
+	    {
+	      fscanf (fp, "%d", &(problem->a[i][j]));
+	    }
+	}
+
+      for (i = 0; i < m; i++)
+	{
+	  fscanf (fp, "%d", &(problem->b[i]));
+	}
+
+      array_list_add (problems, problem);
+    }
+
+  fclose (fp);
 
   return problems;
 }
 
 //calculates total cost
-int gap_calculate_solution(Problem problem)
+int
+gap_calculate_solution (Problem problem)
 {
-
-  int cost=0;
+  int cost = 0;
 
   for (int i = 0; i < problem.m; ++i)
-  {
-    for (int j = 0; j < problem.n; ++j)
     {
-      cost += problem.c[i][j] * problem.x[i][j];
+      for (int j = 0; j < problem.n; ++j)
+	{
+	  cost += problem.c[i][j] * problem.x[i][j];
+	}
     }
-  }
   return cost;
 }
 
@@ -167,31 +141,31 @@ gap_calcuate_lagrangian_function (Problem problem)
   int m = problem.m;
 
   //init result matrix
-  int result =  gap_calculate_solution(problem);
+  int result = gap_calculate_solution (problem);
 
-  int* u = calloc (sizeof(int), m);
+  int *u = calloc (sizeof (int), m);
   int sum;
 
   for (int i = 0; i < m; ++i)
-  {
-    sum = 0;
-    for (int j = 0; j < n; ++j)
     {
-      sum += problem.c[i][j];
-    }
+      sum = 0;
+      for (int j = 0; j < n; ++j)
+	{
+	  sum += problem.c[i][j];
+	}
 
-    sum -= problem.b[i];
-    result -= sum * u[i];
-  }
+      sum -= problem.b[i];
+      result -= sum * u[i];
+    }
   return result;
 }
 
-int**
+int **
 gap_calculate_initial (Problem problem)
 {
-  int** res = malloc (problem.m * sizeof (int *));
+  int **res = malloc (problem.m * sizeof (int *));
   int q;
-  res[0] = calloc(sizeof(int), problem.n * problem.m);
+  res[0] = calloc (sizeof (int), problem.n * problem.m);
   for (q = 1; q < problem.m; q++)
     res[q] = res[0] + q * problem.n;
 
@@ -200,29 +174,146 @@ gap_calculate_initial (Problem problem)
 
   //set to 1 variables that have min cost
   for (int i = 0; i < problem.m; ++i)
-  {
-    minIndex = 0;
-    minValue = problem.c[i][0];
-
-    for (int j = 0; j< problem.n; ++j)
     {
-      if(problem.c[i][j] < minValue)
-      {
-        minIndex = j;
-        minValue = problem.c[i][j];
-      }
-    }
+      minIndex = 0;
+      minValue = problem.c[i][0];
 
-    res[i][minIndex] = 1;
-  }
+      for (int j = 0; j < problem.n; ++j)
+	{
+	  if (problem.c[i][j] < minValue)
+	    {
+	      minIndex = j;
+	      minValue = problem.c[i][j];
+	    }
+	}
+
+      res[i][minIndex] = 1;
+    }
 
   for (int i = 0; i < problem.m; ++i)
-  {
-    printf("\n");
-    for (int j = 0; j < problem.n; ++j)
     {
-      printf("%d ", res[i][j]);
+      printf ("\n");
+      for (int j = 0; j < problem.n; ++j)
+	{
+	  printf ("%d ", res[i][j]);
+	}
     }
-  }
   return res;
+}
+
+void
+gap_problem_free (Problem * problem)
+{
+  int i;
+
+  for (i = 0; i < problem->m; i++)
+    {
+      free (problem->a[i]);
+    }
+
+  free (problem->a);
+  free (problem->b);
+
+  for (i = 0; i < problem->m; i++)
+    {
+      free (problem->c[i]);
+    }
+
+  free (problem->c);
+  free (problem->u);
+
+  for (i = 0; i < problem->m; i++)
+    {
+      free (problem->x[i]);
+    }
+
+  free (problem->x);
+}
+
+Problem *
+gap_problem_new (int m, int n)
+{
+  int i;
+  Problem *problem;
+
+  problem = malloc (sizeof (Problem));
+  problem->a = malloc (m * sizeof (int *));
+
+  for (i = 0; i < m; i++)
+    {
+      problem->a[i] = malloc (n * sizeof (int));
+    }
+
+  problem->b = malloc (m * sizeof (int));
+  problem->c = malloc (m * sizeof (int *));
+
+  for (i = 0; i < m; i++)
+    {
+      problem->c[i] = malloc (n * sizeof (int));
+    }
+
+  problem->m = m;
+  problem->n = n;
+  problem->u = calloc (m, sizeof (int));
+  problem->x = malloc (m * sizeof (int *));
+
+  for (i = 0; i < m; i++)
+    {
+      problem->x[i] = calloc (n, sizeof (int));
+    }
+
+  return problem;
+}
+
+void
+gap_problem_print (Problem * problem)
+{
+  int i;
+  int j;
+
+  printf ("a:\n");
+
+  for (i = 0; i < problem->m; i++)
+    {
+      for (j = 0; j < problem->n; j++)
+	{
+	  printf ("%d%s", problem->a[i][j], (j < (problem->n - 1) ? " " : "\n"));
+	}
+    }
+
+  printf ("b:\n");
+
+  for (i = 0; i < problem->m; i++)
+    {
+      printf ("%d%s", problem->b[i], (i < problem->m ? " " : ""));
+    }
+
+  printf ("\n");
+  printf ("c:\n");
+
+  for (i = 0; i < problem->m; i++)
+    {
+      for (j = 0; j < problem->n; j++)
+	{
+	  printf ("%d%s", problem->c[i][j], (j < (problem->n - 1) ? " " : "\n"));
+	}
+    }
+
+  printf ("u:\n");
+
+  for (i = 0; i < problem->m; i++)
+    {
+      printf ("%d%s", problem->u[i], (i < problem->m ? " " : ""));
+    }
+
+  printf ("\n");
+  printf ("x:\n");
+
+  for (i = 0; i < problem->m; i++)
+    {
+      for (j = 0; j < problem->n; j++)
+	{
+	  printf ("%d%s", problem->x[i][j], (j < (problem->n - 1) ? " " : "\n"));
+	}
+    }
 }
