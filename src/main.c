@@ -28,6 +28,7 @@
 #include "gap.h"
 #include "util.h"
 
+#define ERROR_PREFIX "Error"
 #define VERSION "0.1"
 
 /**
@@ -54,7 +55,7 @@ static void print_version ();
 static void
 print_error (char *message)
 {
-  fprintf (stderr, "Error: %s\n", message);
+  fprintf (stderr, "%s: %s\n", ERROR_PREFIX, message);
 }
 
 static void
@@ -111,6 +112,7 @@ main (int argc, char **argv)
 	  print_version ();
 	  return EXIT_SUCCESS;
 	case 'V':
+          /* Verbose means print statistics like time spent finding the solution. */
 	  verbose = TRUE;
 	  break;
 	default:
@@ -129,7 +131,7 @@ main (int argc, char **argv)
 
   if ((problems = gap_read_data_from_file (ifile, &numProblems)) == NULL)
     {
-      perror ("Error");
+      perror (ERROR_PREFIX);
       return EXIT_FAILURE;
     }
 
