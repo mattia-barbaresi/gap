@@ -23,26 +23,26 @@
 
 #define _HASH_SET_GROW_FACTOR 2
 
-extern inline size_t hash_set_capacity (HashSet *set);
+extern inline size_t hash_set_capacity (HashSet * set);
 
-static void hash_set_entry_free (HashSetEntry *entry);
+static void hash_set_entry_free (HashSetEntry * entry);
 
 static HashSetEntry *hash_set_entry_new (void *element);
 
-static void hash_set_grow (HashSet *set);
+static void hash_set_grow (HashSet * set);
 
 static int hash_set_guard (int hash);
 
-static size_t hash_set_index (HashSet *set, void *element);
+static size_t hash_set_index (HashSet * set, void *element);
 
-static inline void hash_set_relocate_entries (HashSet *set, HashSetEntry **old_entries, size_t old_capacity);
+static inline void hash_set_relocate_entries (HashSet * set, HashSetEntry ** old_entries, size_t old_capacity);
 
-extern inline size_t hash_set_size (HashSet *set);
+extern inline size_t hash_set_size (HashSet * set);
 
 static inline size_t hash_set_threshold (size_t capacity, float load_factor);
 
 int
-hash_set_add (HashSet *set, void *element)
+hash_set_add (HashSet * set, void *element)
 {
   Comparator compare;
   int comparison;
@@ -100,7 +100,7 @@ hash_set_add (HashSet *set, void *element)
 }
 
 void
-hash_set_clear (HashSet *set, Destructor destroy)
+hash_set_clear (HashSet * set, Destructor destroy)
 {
   HashSetEntry *curr;
   int i;
@@ -111,20 +111,20 @@ hash_set_clear (HashSet *set, Destructor destroy)
       curr = set->entries[i];
 
       while (curr != NULL)
-        {
-          prev = curr;
-          curr = curr->next;
+	{
+	  prev = curr;
+	  curr = curr->next;
 
-          destroy (prev->element);
-          hash_set_entry_free (prev);
-        }
+	  destroy (prev->element);
+	  hash_set_entry_free (prev);
+	}
     }
 
   set->size = 0;
 }
 
 int
-hash_set_contains (HashSet *set, void *element)
+hash_set_contains (HashSet * set, void *element)
 {
   Comparator compare;
   int comparison;
@@ -148,7 +148,8 @@ hash_set_contains (HashSet *set, void *element)
   return FALSE;
 }
 
-void hash_set_ensure_capacity (HashSet *set, size_t capacity)
+void
+hash_set_ensure_capacity (HashSet * set, size_t capacity)
 {
   size_t old_capacity;
   HashSetEntry **old_entries;
@@ -166,7 +167,7 @@ void hash_set_ensure_capacity (HashSet *set, size_t capacity)
 }
 
 static void
-hash_set_entry_free (HashSetEntry *entry)
+hash_set_entry_free (HashSetEntry * entry)
 {
   free (entry);
 }
@@ -180,14 +181,14 @@ hash_set_entry_new (void *element)
 }
 
 void
-hash_set_free (HashSet *set)
+hash_set_free (HashSet * set)
 {
   free (set->entries);
   free (set);
 }
 
 static void
-hash_set_grow (HashSet *set)
+hash_set_grow (HashSet * set)
 {
   hash_set_ensure_capacity (set, set->capacity * _HASH_SET_GROW_FACTOR);
 }
@@ -200,7 +201,7 @@ hash_set_guard (int hash)
 }
 
 static size_t
-hash_set_index (HashSet *set, void *element)
+hash_set_index (HashSet * set, void *element)
 {
   int hash = hash_set_guard (set->hashf (element));
   return hash & (set->capacity - 1);
@@ -245,7 +246,7 @@ hash_set_new (size_t capacity, float load_factor, HashFunction hashf, Comparator
 }
 
 static inline void
-hash_set_relocate_entries (HashSet *set, HashSetEntry **old_entries, size_t old_capacity)
+hash_set_relocate_entries (HashSet * set, HashSetEntry ** old_entries, size_t old_capacity)
 {
   Comparator compare;
   HashSetEntry *curr;
@@ -262,36 +263,36 @@ hash_set_relocate_entries (HashSet *set, HashSetEntry **old_entries, size_t old_
       old_entry = old_entries[i];
 
       while (old_entry != NULL)
-        {
-          new_entry = old_entry;
-          old_entry = old_entry->next;
+	{
+	  new_entry = old_entry;
+	  old_entry = old_entry->next;
 
-          index = hash_set_index (set, new_entry->element);
-          prev = NULL;
-          curr = set->entries[index];
+	  index = hash_set_index (set, new_entry->element);
+	  prev = NULL;
+	  curr = set->entries[index];
 
-          while (curr != NULL && compare (new_entry->element, curr->element) < 0)
-            {
-              prev = curr;
-              curr = curr->next;
-            }
+	  while (curr != NULL && compare (new_entry->element, curr->element) < 0)
+	    {
+	      prev = curr;
+	      curr = curr->next;
+	    }
 
-          if (prev == NULL)
-            {
-              set->entries[index] = new_entry;
-            }
-          else
-            {
-              prev->next = new_entry;
-            }
+	  if (prev == NULL)
+	    {
+	      set->entries[index] = new_entry;
+	    }
+	  else
+	    {
+	      prev->next = new_entry;
+	    }
 
-          new_entry->next = curr;
-        }
+	  new_entry->next = curr;
+	}
     }
 }
 
 void
-hash_set_remove (HashSet *set, void *element)
+hash_set_remove (HashSet * set, void *element)
 {
   Comparator compare;
   int comparison;

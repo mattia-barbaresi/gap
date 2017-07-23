@@ -47,28 +47,28 @@ typedef struct
   size_t threshold;
 } HashSet;
 
-int hash_set_add (HashSet *set, void *element);
+int hash_set_add (HashSet * set, void *element);
 
 inline size_t
-hash_set_capacity (HashSet *set)
+hash_set_capacity (HashSet * set)
 {
   return set->capacity;
 }
 
-void hash_set_clear (HashSet *set, Destructor destroy);
+void hash_set_clear (HashSet * set, Destructor destroy);
 
-int hash_set_contains (HashSet *set, void *element);
+int hash_set_contains (HashSet * set, void *element);
 
-void hash_set_ensure_capacity (HashSet *set, size_t capacity);
+void hash_set_ensure_capacity (HashSet * set, size_t capacity);
 
-void hash_set_free (HashSet *set);
+void hash_set_free (HashSet * set);
 
 HashSet *hash_set_new (size_t capacity, float load_factor, HashFunction hashf, Comparator compare);
 
-void hash_set_remove (HashSet *set, void *element);
+void hash_set_remove (HashSet * set, void *element);
 
 inline size_t
-hash_set_size (HashSet *set)
+hash_set_size (HashSet * set)
 {
   return set->size;
 }
