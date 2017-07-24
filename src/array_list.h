@@ -53,7 +53,7 @@ typedef struct
  * @param list the array list.
  * @param elem the element to append to the array list.
  */
-void array_list_add (ArrayList * list, void *elem);
+int array_list_add (ArrayList * list, void *elem);
 
 /**
  * @brief Append all the elements of the specified array to the end of the array list.
@@ -62,7 +62,7 @@ void array_list_add (ArrayList * list, void *elem);
  * @param elems the array of elements to append to the array list.
  * @param size the size of the array.
  */
-void array_list_add_all (ArrayList * list, void **elems, size_t size);
+int array_list_add_all (ArrayList * list, void **elems, size_t size);
 
 /**
  * @brief Return the capacity of the specified array list.
@@ -99,7 +99,7 @@ void array_list_clear (ArrayList * list, Destructor destroy);
  * @param list the array list.
  * @param capacity the desired minimum capacity.
  */
-void array_list_ensure_capacity (ArrayList * list, size_t capacity);
+int array_list_ensure_capacity (ArrayList * list, size_t capacity);
 
 /**
  * @brief Free the specified array list instance.
@@ -154,9 +154,6 @@ void *array_list_remove (ArrayList * list, unsigned int pos);
 /**
  * @brief Replace the element at the specified position in the list.
  *
- * This operation differs from array_list_set_element_at() in the fact that if the specified position is greater than the
- * size of the array list an error will be thrown.
- *
  * @param list the array list.
  * @param elem the element to be stored at the specified position.
  * @param pos index of the element to replace.
@@ -185,6 +182,6 @@ array_list_size (ArrayList * list)
  *
  * @param list the array list.
  */
-void array_list_trim_to_size (ArrayList * list);
+int array_list_trim_to_size (ArrayList * list);
 
 #endif

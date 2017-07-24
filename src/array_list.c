@@ -37,29 +37,39 @@ extern inline size_t array_list_size (ArrayList * list);
  *
  * @param alist the array list.
  */
-static void array_list_grow (ArrayList * list);
+static int array_list_grow (ArrayList * list);
 
-void
+int
 array_list_add (ArrayList * list, void *element)
 {
   /* Before appending the element to the array list, we ensure it can contain them. If not we let the array grow. */
   if (list->capacity == list->size)
     {
-      array_list_grow (list);
+      if (!array_list_grow (list))
+        return FALSE;
     }
 
   list->elements[list->size++] = element;
+
+  return TRUE;
 }
 
-void
+int
 array_list_add_all (ArrayList * list, void **elements, size_t size)
 {
   int i;
 
+  if (!array_list_ensure_capacity (list, list->size + size))
+    {
+      return FALSE;
+    }
+
   for (i = 0; i < size; i++)
     {
-      array_list_add (list, elements[i]);
+      list->elements[list->size++] = elements[i];
     }
+
+  return TRUE;
 }
 
 void
@@ -77,14 +87,20 @@ array_list_clear (ArrayList * list, Destructor destroy)
   list->size = 0;
 }
 
-void
+int
 array_list_ensure_capacity (ArrayList * list, size_t capacity)
 {
   if (capacity > list->capacity)
     {
-      list->elements = realloc (list->elements, capacity * sizeof (void *));
+      if ((list->elements = realloc (list->elements, capacity * sizeof (void *))) == NULL)
+        {
+          return FALSE;
+        }
+
       list->capacity = capacity;
     }
+
+  return TRUE;
 }
 
 void
@@ -94,10 +110,10 @@ array_list_free (ArrayList * list)
   free (list);
 }
 
-static void
+static int
 array_list_grow (ArrayList * list)
 {
-  array_list_ensure_capacity (list, array_list_capacity (list) * _ARRAY_LIST_GROW_FACTOR);
+  return array_list_ensure_capacity (list, array_list_capacity (list) * _ARRAY_LIST_GROW_FACTOR);
 }
 
 ArrayList *
@@ -147,7 +163,7 @@ array_list_set (ArrayList * list, void *elem, unsigned int pos)
   list->elements[pos] = elem;
 }
 
-void
+int
 array_list_trim_to_size (ArrayList * list)
 {
   int capacity;
@@ -155,7 +171,14 @@ array_list_trim_to_size (ArrayList * list)
   if (list->size < list->capacity)
     {
       capacity = list->size > 0 ? list->size : 1;
-      list->elements = realloc (list->elements, capacity);
+
+      if ((list->elements = realloc (list->elements, capacity)) == NULL)
+        {
+          return FALSE;
+        }
+
       list->capacity = capacity;
     }
+
+  return TRUE;
 }

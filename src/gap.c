@@ -214,7 +214,7 @@ gap_problem_print (Problem * problem)
     {
       for (j = 0; j < problem->n; j++)
 	{
-	  printf ("%d%s", problem->a[i][j], (j < (problem->n - 1) ? " " : "\n"));
+ 	  printf ("%d%s", problem->a[i][j], (j < (problem->n - 1) ? " " : "\n"));
 	}
     }
 
@@ -266,38 +266,24 @@ gap_problems_from_file (char *fname)
   int n;
   int n_problems;
   Problem *problem;
-  ArrayList *problems;
+  ArrayList *problems = NULL;
 
-  if ((fp = fopen (fname, "r")) == NULL)
-    {
-      return NULL;
-    }
-
-  fscanf (fp, "%d", &n_problems);
-
-  if ((problems = array_list_new (n_problems)) == NULL)
-    {
-      return NULL;
-    }
+  /* *INDENT-OFF* */
+  if ((fp = fopen (fname, "r")) == NULL) goto io_exception;
+  if (fscanf (fp, "%d", &n_problems) == EOF) goto io_exception;
+  if ((problems = array_list_new (n_problems)) == NULL) goto memory_exception;
 
   for (k = 0; k < n_problems; k++)
     {
-      fscanf (fp, "%d", &m);
-      fscanf (fp, "%d", &n);
-
-      if ((problem = gap_problem_new (m, n)) == NULL)
-        {
-          array_list_clear (problems, (Destructor) gap_problem_free);
-          array_list_free (problems);
-
-          return NULL;
-        }
+      if (fscanf (fp, "%d", &m) == EOF) goto io_exception;
+      if (fscanf (fp, "%d", &n) == EOF) goto io_exception;
+      if ((problem = gap_problem_new (m, n)) == NULL) goto memory_exception;
 
       for (i = 0; i < m; i++)
 	{
 	  for (j = 0; j < n; j++)
 	    {
-	      fscanf (fp, "%d", &(problem->c[i][j]));
+	      if (fscanf (fp, "%d", &(problem->c[i][j])) == EOF) goto io_exception;
 	    }
 	}
 
@@ -305,25 +291,35 @@ gap_problems_from_file (char *fname)
 	{
 	  for (j = 0; j < n; j++)
 	    {
-	      fscanf (fp, "%d", &(problem->a[i][j]));
+	      if (fscanf (fp, "%d", &(problem->a[i][j])) == EOF) goto io_exception;
 	    }
 	}
 
       for (i = 0; i < m; i++)
 	{
-	  fscanf (fp, "%d", &(problem->b[i]));
+	  if (fscanf (fp, "%d", &(problem->b[i])) == EOF) goto io_exception;
 	}
 
-      array_list_add (problems, problem);
+      if (!array_list_add (problems, problem)) goto memory_exception;
     }
 
-  if (fclose (fp) == EOF)
+  if (fclose (fp) == EOF) goto io_exception;
+  /* *INDENT-ON* */
+
+  return problems;
+
+memory_exception:
+io_exception:
+  if (fp != NULL)
+    {
+      fclose (fp);
+    }
+
+  if (problems != NULL)
     {
       array_list_clear (problems, (Destructor) gap_problem_free);
       array_list_free (problems);
-
-      return NULL;
     }
 
-  return problems;
+  return NULL;
 }

@@ -37,6 +37,8 @@
 #define FALSE 0
 #endif
 
+#define TRY(condition, label) { if (!(condition)) goto label; }
+
 /**
  * @brief A destructor is a function used to free objects.
  *
