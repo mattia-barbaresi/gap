@@ -24,8 +24,8 @@ else
 FLAGS+= -pipe -O3 -march=native -DNDEBUG
 endif
 
-all: array_list.o array_stack.o gap.o hash_set.o main.o util.o
-	$(CC) $(FLAGS) array_list.o array_stack.o gap.o hash_set.o main.o util.o -o main
+all: array_list.o array_stack.o gap.o problem.o hash_set.o main.o util.o
+	$(CC) $(FLAGS) array_list.o array_stack.o gap.o problem.o hash_set.o main.o util.o -o main
 
 array_list.o: array_list.h array_list.c util.h
 	$(CC) $(FLAGS) array_list.c -c -o array_list.o
@@ -38,6 +38,9 @@ clean:
 
 gap.o: array_list.h array_stack.h gap.h gap.c util.h
 	$(CC) $(FLAGS) gap.c -c -o gap.o
+
+problem.o: problem.h problem.c
+	$(CC) $(FLAGS) problem.c -c -o problem.o
 
 hash_set.o: hash_set.h hash_set.c util.h
 	$(CC) $(FLAGS) hash_set.c -c -o hash_set.o

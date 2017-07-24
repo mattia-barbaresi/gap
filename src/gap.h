@@ -18,21 +18,7 @@
 #ifndef _GAP_H
 #define _GAP_H
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "array_list.h"
-
-typedef struct
-{
-  int **a;
-  int **c;
-  int **x;
-  int *b;
-  int *u;
-  int m;
-  int n;
-} Problem;
+#include "problem.h"
 
 int gap_branch_and_bound ();
 
@@ -46,14 +32,5 @@ int **gap_calculate_initial (Problem * problem);
 
 //calculates the value of the objective function
 int gap_calculate_solution (Problem * problem);
-
-//reads data from file and inits structures
-ArrayList *gap_problems_from_file (char *fname);
-
-void gap_problem_free (Problem * problem);
-
-Problem *gap_problem_new (int m, int n);
-
-void gap_problem_print (Problem * problem);
 
 #endif

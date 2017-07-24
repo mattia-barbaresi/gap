@@ -27,6 +27,7 @@
 
 #include "gap.h"
 #include "util.h"
+#include "problem.h"
 
 #define ERROR_PREFIX "Error"
 #define VERSION "0.1"
