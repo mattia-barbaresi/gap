@@ -26,8 +26,8 @@
 #include <unistd.h>
 
 #include "gap.h"
-#include "util.h"
 #include "problem.h"
+#include "util.h"
 
 #define ERROR_PREFIX "Error"
 #define VERSION "0.1"
