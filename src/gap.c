@@ -87,7 +87,7 @@ gap_calcuate_lagrangian_function (Problem * problem)
     }
 
   free (u);
-
+  printf ("valore soluzione lagrnagiana: %d\n", result);
   return result;
 }
 
@@ -108,21 +108,21 @@ gap_calculate_initial (Problem * problem)
     res[q] = res[0] + q * problem->n;
 
   //set to 1 variables that have min cost
-  for (i = 0; i < problem->m; i++)
+  for (j = 0; j < problem->n; j++)
     {
       minIndex = 0;
-      minValue = problem->c[i][0];
+      minValue = problem->c[0][j];
 
-      for (j = 0; j < problem->n; j++)
+      for (i = 0; i < problem->m; i++)
 	{
 	  if (problem->c[i][j] < minValue)
 	    {
-	      minIndex = j;
+	      minIndex = i;
 	      minValue = problem->c[i][j];
 	    }
 	}
 
-      res[i][minIndex] = 1;
+      res[minIndex][j] = 1;
     }
 
   for (i = 0; i < problem->m; i++)
@@ -134,6 +134,7 @@ gap_calculate_initial (Problem * problem)
 	  printf ("%d ", res[i][j]);
 	}
     }
+  printf ("\n");
 
   return res;
 }
