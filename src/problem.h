@@ -1,7 +1,24 @@
-#include "array_list.h"
+/*
+ * This file is part of gap.
+ *
+ * gap is free software: you can redistribute it and/or modify
+ * under the terms of the GNU General Public License as published by
+ * Free Software Foundation, either version 3 of the License, or
+ * your option) any later version.
+ *
+ * gap is distributed in the hope that it will be useful,
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * CHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gap.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef _PROBLEM_H
 #define _PROBLEM_H
+
+#include "array_list.h"
 
 typedef struct
 {
@@ -14,13 +31,12 @@ typedef struct
   int n;
 } Problem;
 
-//reads data from file and inits structures
-ArrayList *gap_problems_from_file (char *fname);
-
 void gap_problem_free (Problem * problem);
 
 Problem *gap_problem_new (int m, int n);
 
 void gap_problem_print (Problem * problem);
+
+ArrayList *gap_problems_from_file (char *fname);
 
 #endif
