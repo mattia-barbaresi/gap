@@ -28,9 +28,12 @@ int gap_lower_bound ();
 int gap_calcuate_lagrangian_function (Problem * problem);
 
 //calculates initial solution for first relaxation
-int **gap_calculate_initial (Problem * problem);
+void gap_calculate_initial (Problem * problem);
 
 //calculates the value of the objective function
 int gap_calculate_solution (Problem * problem);
+
+//checks if constraint are satisfied
+int gap_are_constraints_satisfied (Problem * problem);
 
 #endif

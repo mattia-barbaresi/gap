@@ -91,21 +91,13 @@ gap_calcuate_lagrangian_function (Problem * problem)
   return result;
 }
 
-int **
+void
 gap_calculate_initial (Problem * problem)
 {
   int i;
   int j;
   int minIndex;
   int minValue;
-  int q;
-  int **res;
-
-  res = malloc (problem->m * sizeof (int *));
-  res[0] = calloc (problem->n * problem->m, sizeof (int));
-
-  for (q = 1; q < problem->m; q++)
-    res[q] = res[0] + q * problem->n;
 
   //set to 1 variables that have min cost
   for (j = 0; j < problem->n; j++)
@@ -122,7 +114,7 @@ gap_calculate_initial (Problem * problem)
 	    }
 	}
 
-      res[minIndex][j] = 1;
+     problem->x[minIndex][j] = 1;
     }
 
   for (i = 0; i < problem->m; i++)
@@ -131,10 +123,34 @@ gap_calculate_initial (Problem * problem)
 
       for (j = 0; j < problem->n; j++)
 	{
-	  printf ("%d ", res[i][j]);
+	  printf ("%d ", problem->x[i][j]);
 	}
     }
-  printf ("\n");
 
-  return res;
+  printf ("\n");
+}
+
+int
+gap_are_constraints_satisfied (Problem * problem)
+{
+   int i,j,sum;
+
+   for (i = 0; i < problem->m; i++)
+    {
+      sum = 0;
+
+      for (j = 0; j < problem->n; j++)
+        {
+          sum += problem->a[i][j] * problem->x[i][j];
+        }
+
+      if(sum > problem->b[i])
+      {
+        printf("Constraints not satisifed!\n");
+        return 0;
+      }
+    }
+
+    printf("Constraints satisifed!\n");
+    return 1;
 }
