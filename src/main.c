@@ -138,14 +138,11 @@ main (int argc, char **argv)
     
 
   for (i = 0; i < array_list_size (problems); i++)
-    {
-      printf("\nPROBLEM %d   ===================================\n",i);
-      
-      gap_calculate_initial (array_list_get (problems, i));
-      int sol = gap_calcuate_lagrangian_function (array_list_get (problems, i));
-      gap_are_constraints_satisfied (array_list_get (problems, i));
-    }
+	{
+		printf("\nPROBLEM %d   ===================================\n",i);
 
+	  	gap_subgradient (array_list_get (problems, i));
+  	}
 
   array_list_clear (problems, (Destructor) gap_problem_free);
   array_list_free (problems);

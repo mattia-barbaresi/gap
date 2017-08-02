@@ -38,9 +38,11 @@ gap_problem_free (Problem * problem)
   for (i = 0; i < problem->m; i++)
     {
       free (problem->c[i]);
+      free (problem->costs[i]);
     }
 
   free (problem->c);
+  free (problem->costs);
   free (problem->u);
 
   for (i = 0; i < problem->m; i++)
@@ -67,15 +69,17 @@ gap_problem_new (int m, int n)
 
   problem->b = malloc (m * sizeof (int));
   problem->c = malloc (m * sizeof (int *));
+  problem->costs = malloc (m * sizeof (int *));
 
   for (i = 0; i < m; i++)
     {
       problem->c[i] = malloc (n * sizeof (int));
+      problem->costs[i] = malloc (n * sizeof (int));
     }
 
   problem->m = m;
   problem->n = n;
-  problem->u = calloc (m, sizeof (int));
+  problem->u = calloc (m, sizeof (float));
   problem->x = malloc (m * sizeof (int *));
 
   for (i = 0; i < m; i++)
@@ -124,7 +128,7 @@ gap_problem_print (Problem * problem)
 
   for (i = 0; i < problem->m; i++)
     {
-      printf ("%d%s", problem->u[i], (i < problem->m ? " " : ""));
+      printf ("%f%s", problem->u[i], (i < problem->m ? " " : ""));
     }
 
   printf ("\n");

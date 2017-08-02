@@ -28,12 +28,22 @@ int gap_lower_bound ();
 int gap_calcuate_lagrangian_function (Problem * problem);
 
 //calculates initial solution for first relaxation
-void gap_calculate_initial (Problem * problem);
+void gap_calculate_initial_lagrangian (Problem * problem);
 
 //calculates the value of the objective function
 int gap_calculate_solution (Problem * problem);
 
 //checks if constraint are satisfied
 int gap_are_constraints_satisfied (Problem * problem);
+
+int gap_are_lagrangian_constraints_satisfied (Problem * problem);
+
+int* gap_calculate_subgradient_stepsize_vector(Problem * problem);
+
+int gap_calculate_subgradient_stepsize(int* y, int m);
+
+int gap_subgradient(Problem * problem);
+
+void gap_get_costs_with_relaxiation(Problem * problem);
 
 #endif

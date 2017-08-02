@@ -24,9 +24,10 @@ typedef struct
 {
   int **a;
   int **c;
+  int **costs;
   int **x;
   int *b;
-  int *u;
+  float *u;
   int m;
   int n;
 } Problem;

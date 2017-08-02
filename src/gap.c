@@ -56,43 +56,31 @@ gap_calculate_solution (Problem * problem)
 	  cost += problem->c[i][j] * problem->x[i][j];
 	}
     }
-
+    printf ("valore soluzione gap: %d\n", cost);
   return cost;
 }
 
 int
 gap_calcuate_lagrangian_function (Problem * problem)
 {
+  int cost = 0;
   int i;
   int j;
-  int result;
-  int sum;
-  int *u;
-
-  //init result matrix
-  result = gap_calculate_solution (problem);
-  u = calloc (problem->m, sizeof (int));
 
   for (i = 0; i < problem->m; i++)
     {
-      sum = 0;
-
       for (j = 0; j < problem->n; j++)
-	{
-	  sum += problem->c[i][j];
-	}
-
-      sum -= problem->b[i];
-      result -= sum * u[i];
+        {
+          cost += problem->costs[i][j] * problem->x[i][j];
+        }
     }
 
-  free (u);
-  printf ("valore soluzione lagrnagiana: %d\n", result);
-  return result;
+  printf ("valore soluzione lagrnagiana: %d\n", cost);
+  return cost;
 }
 
 void
-gap_calculate_initial (Problem * problem)
+gap_calculate_initial_lagrangian (Problem * problem)
 {
   int i;
   int j;
@@ -103,16 +91,17 @@ gap_calculate_initial (Problem * problem)
   for (j = 0; j < problem->n; j++)
     {
       minIndex = 0;
-      minValue = problem->c[0][j];
+      minValue = problem->costs[0][j];
 
       for (i = 0; i < problem->m; i++)
-	{
-	  if (problem->c[i][j] < minValue)
-	    {
-	      minIndex = i;
-	      minValue = problem->c[i][j];
-	    }
-	}
+    	{
+            problem->x[i][j] = 0;
+    	  if (problem->costs[i][j] < minValue)
+    	    {
+    	      minIndex = i;
+    	      minValue = problem->costs[i][j];
+    	    }
+    	}
 
      problem->x[minIndex][j] = 1;
     }
@@ -130,6 +119,18 @@ gap_calculate_initial (Problem * problem)
   printf ("\n");
 }
 
+void
+gap_get_costs_with_relaxiation(Problem * problem)
+{
+  for (int i = 0; i < problem->m; ++i)
+  {
+    for (int j = 0; j < problem->n; ++j)
+    {
+      problem->costs[i][j] = problem->c[i][j] - problem->u[i] * (problem->a[i][j] - problem->b[i]);
+    }
+  }
+}
+
 int
 gap_are_constraints_satisfied (Problem * problem)
 {
@@ -144,7 +145,7 @@ gap_are_constraints_satisfied (Problem * problem)
           sum += problem->a[i][j] * problem->x[i][j];
         }
 
-      if(sum > problem->b[i])
+      if(sum >= problem->b[i])
       {
         printf("Constraints not satisifed!\n");
         return 0;
@@ -153,4 +154,141 @@ gap_are_constraints_satisfied (Problem * problem)
 
     printf("Constraints satisifed!\n");
     return 1;
+}
+
+int
+gap_are_lagrangian_constraints_satisfied (Problem * problem)
+{
+   int i,j,sum;
+
+   for (i = 0; i < problem->m; i++)
+    {
+      sum = 0;
+
+      for (j = 0; j < problem->n; j++)
+        {
+          sum += problem->a[i][j] * problem->x[i][j];
+        }
+
+      if( problem->u[i] * (sum - problem->b[i]) != 0)
+      {
+        printf("Lagrangian constraints not satisifed!\n");
+        return 0;
+      }
+    }
+
+    printf("Lagrangian constraints satisifed!\n");
+    return 1;
+}
+
+int*
+gap_calculate_subgradient_stepsize_vector(Problem * problem)
+{
+  int sum;
+  int* y = calloc (problem->m, sizeof (int));
+
+  for (int i = 0; i < problem->m; i++)
+  {
+    sum = 0;
+
+    for (int j = 0; j < problem->n; j++)
+      {
+        sum += problem->a[i][j] * problem->x[i][j];
+      }
+
+    y[i] = sum - problem->b[i];
+  }
+  return y;
+}
+
+int
+gap_calculate_subgradient_stepsize(int* y, int m)
+{
+  int sum = 0;
+
+  for (int i = 0; i < m; i++)
+    sum += y[i] * y[i];
+
+  return sum;
+}
+
+int
+gap_subgradient(Problem * problem)
+{
+
+  int maxIter = 300;
+  float alpha = 2;
+  int delta = 30; //after delta iteration alpha = alpha/2
+  int trials = 0;
+  int lb = -999999;
+  int lu;
+  int iter = 1;
+  int* y;
+  int step_size;
+  float res;
+  float lz =  3;
+
+
+  while(iter <= maxIter)
+  {
+
+    gap_get_costs_with_relaxiation(problem);
+
+    gap_calculate_initial_lagrangian(problem);
+
+    printf("costs: \n");
+
+    for (int i = 0; i < problem->m; ++i)
+    {
+
+      for (int j = 0; j < problem->n; ++j)
+        {
+          printf("%d ", problem->costs[i][j] );
+        }
+      printf("\n");
+    }
+
+    lu = gap_calcuate_lagrangian_function(problem);
+
+    if(lu > lb)
+    {
+      lb = lu;
+      trials = 0;
+    }
+
+    //solution x is optimal -> STOP
+    if(gap_are_constraints_satisfied(problem) == 1 && gap_are_lagrangian_constraints_satisfied(problem) == 1)
+    {
+      printf("Exit subgradient function...optimal solution found!\n");
+      return 0;
+    }
+
+    y = gap_calculate_subgradient_stepsize_vector(problem);
+    step_size = gap_calculate_subgradient_stepsize(y, problem->m);
+    
+    //definisci nuovi u
+    for (int i = 0; i < problem->m; ++i)
+    {
+
+      res = problem->u[i] - (alpha * ((float)(lz - lu))/step_size) * y[i];
+      printf("res: %f = %f - (%f * (%f - %d)/%d ) * %d \n", res, problem->u[i], alpha ,lz, lu,step_size, y[i]);
+      problem->u[i] = res > 0 ? res : 0;
+    }
+    // printf("problem u vector\n");
+
+    // for (int i = 0; i < problem->m; ++i)
+    // {
+    //   printf("u(i): %f\n", problem->u[i] );
+    // }
+
+    iter++;   
+    //if L(u) <= lb for trials consecutive iterations then is a good practice to decrement alpha
+    trials++;
+    if(trials == delta){
+      alpha = alpha/2;
+      trials = 0;
+    }
+  }
+  printf("Exit subgradient function...maxIter limit reached!\n");
+  return 1;
 }
