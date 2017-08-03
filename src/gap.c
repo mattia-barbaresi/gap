@@ -73,6 +73,7 @@ gap_calcuate_lagrangian_function (Problem * problem)
         {
           cost += problem->costs[i][j] * problem->x[i][j];
         }
+        cost += problem->u[i] * problem->b[i];
     }
 
   printf ("valore soluzione lagrnagiana: %d\n", cost);
@@ -122,13 +123,17 @@ gap_calculate_initial_lagrangian (Problem * problem)
 void
 gap_get_costs_with_relaxiation(Problem * problem)
 {
-  for (int i = 0; i < problem->m; ++i)
-  {
-    for (int j = 0; j < problem->n; ++j)
+    printf("-----costs: \n");
+
+    for (int i = 0; i < problem->m; ++i)
     {
-      problem->costs[i][j] = problem->c[i][j] - problem->u[i] * (problem->a[i][j] - problem->b[i]);
+        for (int j = 0; j < problem->n; ++j)
+        {
+          problem->costs[i][j] = problem->c[i][j] - problem->u[i] * problem->a[i][j];
+          printf("%d ", problem->costs[i][j] );
+        }
+    printf("\n");
     }
-  }
 }
 
 int
@@ -216,18 +221,17 @@ int
 gap_subgradient(Problem * problem)
 {
 
-  int maxIter = 300;
-  float alpha = 2;
-  int delta = 30; //after delta iteration alpha = alpha/2
+  int maxIter = 150;
+  float alpha = 1;
+  int delta = 20; //after delta iteration alpha = alpha/2
   int trials = 0;
-  int lb = -999999;
+  float lb = -999;
   int lu;
   int iter = 1;
   int* y;
   int step_size;
   float res;
-  float lz =  3;
-
+  float lz =  lb * 0.3;
 
   while(iter <= maxIter)
   {
@@ -236,24 +240,15 @@ gap_subgradient(Problem * problem)
 
     gap_calculate_initial_lagrangian(problem);
 
-    printf("costs: \n");
-
-    for (int i = 0; i < problem->m; ++i)
-    {
-
-      for (int j = 0; j < problem->n; ++j)
-        {
-          printf("%d ", problem->costs[i][j] );
-        }
-      printf("\n");
-    }
-
     lu = gap_calcuate_lagrangian_function(problem);
+
+    printf("primal solution: %d\n", gap_calculate_solution(problem));
 
     if(lu > lb)
     {
       lb = lu;
       trials = 0;
+      lz = lb < 0.0 ? (-lb * 0.3) : lb * 0.3;
     }
 
     //solution x is optimal -> STOP
@@ -270,22 +265,16 @@ gap_subgradient(Problem * problem)
     for (int i = 0; i < problem->m; ++i)
     {
 
-      res = problem->u[i] - (alpha * ((float)(lz - lu))/step_size) * y[i];
-      printf("res: %f = %f - (%f * (%f - %d)/%d ) * %d \n", res, problem->u[i], alpha ,lz, lu,step_size, y[i]);
-      problem->u[i] = res > 0 ? res : 0;
+      res = problem->u[i] - alpha * ((float) lz /step_size) * y[i];
+      printf("res: %f = %f - (%f * (%f / %d ) * %d \n", res, problem->u[i], alpha ,lz, step_size, y[i]);
+      problem->u[i] = res < 0.0 ? res : 0.0;
     }
-    // printf("problem u vector\n");
-
-    // for (int i = 0; i < problem->m; ++i)
-    // {
-    //   printf("u(i): %f\n", problem->u[i] );
-    // }
 
     iter++;   
     //if L(u) <= lb for trials consecutive iterations then is a good practice to decrement alpha
     trials++;
     if(trials == delta){
-      alpha = alpha/2;
+      alpha = alpha * 0.75;
       trials = 0;
     }
   }
