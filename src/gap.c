@@ -223,7 +223,7 @@ gap_subgradient(Problem * problem)
 {
 
   int maxIter = 150;
-  float alpha = 2;
+  float alpha = 1;
   int delta = 20; //after delta iteration alpha = alpha/2
   int trials = 0;
   double lb = -999;
@@ -232,7 +232,7 @@ gap_subgradient(Problem * problem)
   int* y;
   double step_size;
   float res;
-  double lz =  3;
+  double lz =  333;
   int** xOpt = malloc (problem->m * sizeof (int *));
 
   for (int i = 0; i < problem->m; i++)
@@ -255,7 +255,7 @@ gap_subgradient(Problem * problem)
     {
         lb = lu;
         trials = 0;
-        // lz = lb < 0.0 ? (-lb * 0.3) : lb * 0.3;
+        lz = lb < 0.0 ? (-lb * 0.3) : lb * 0.3;
         copyMatrix(problem->x, xOpt, problem->m, problem->n);
     }
 
@@ -267,13 +267,13 @@ gap_subgradient(Problem * problem)
     }
 
     y = gap_calculate_subgradient_stepsize_vector(problem);
-    step_size = (double)gap_calculate_subgradient_stepsize(y, problem->m);
+    step_size = sqrt((double)gap_calculate_subgradient_stepsize(y, problem->m));
     
     //definisci nuovi u
     for (int i = 0; i < problem->m; ++i)
     {
 
-      res = problem->u[i] - alpha * ((lz-lb) /step_size) * y[i];
+      res = problem->u[i] - alpha * (lz /step_size) * y[i];
       // printf("res: %f = %f - (%f * (%f / %f ) * %d \n", res, problem->u[i], alpha ,lz, step_size, y[i]);
       problem->u[i] = res < 0.0 ? res : 0.0;
       // printf("u: %f\n", problem->u[i]);
