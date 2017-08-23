@@ -24,7 +24,7 @@ typedef struct
 {
   int **a;
   int **c;
-  int **costs;
+  double **costs;
   int **x;
   int *b;
   float *u;

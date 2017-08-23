@@ -69,12 +69,12 @@ gap_problem_new (int m, int n)
 
   problem->b = malloc (m * sizeof (int));
   problem->c = malloc (m * sizeof (int *));
-  problem->costs = malloc (m * sizeof (int *));
+  problem->costs = malloc (m * sizeof (double *));
 
   for (i = 0; i < m; i++)
     {
       problem->c[i] = malloc (n * sizeof (int));
-      problem->costs[i] = malloc (n * sizeof (int));
+      problem->costs[i] = malloc (n * sizeof (double));
     }
 
   problem->m = m;

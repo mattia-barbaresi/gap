@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 #include "array_list.h"
 #include "array_stack.h"
@@ -60,10 +61,10 @@ gap_calculate_solution (Problem * problem)
   return cost;
 }
 
-int
+double
 gap_calcuate_lagrangian_function (Problem * problem)
 {
-  int cost = 0;
+  double cost = 0;
   int i;
   int j;
 
@@ -76,7 +77,7 @@ gap_calcuate_lagrangian_function (Problem * problem)
         cost += problem->u[i] * problem->b[i];
     }
 
-  printf ("valore soluzione lagrnagiana: %d\n", cost);
+  printf ("valore soluzione lagrnagiana: %f\n", cost);
   return cost;
 }
 
@@ -86,7 +87,7 @@ gap_calculate_initial_lagrangian (Problem * problem)
   int i;
   int j;
   int minIndex;
-  int minValue;
+  double minValue;
 
   //set to 1 variables that have min cost
   for (j = 0; j < problem->n; j++)
@@ -95,44 +96,44 @@ gap_calculate_initial_lagrangian (Problem * problem)
       minValue = problem->costs[0][j];
 
       for (i = 0; i < problem->m; i++)
-    	{
-            problem->x[i][j] = 0;
-    	  if (problem->costs[i][j] < minValue)
-    	    {
-    	      minIndex = i;
-    	      minValue = problem->costs[i][j];
-    	    }
-    	}
+        {
+          problem->x[i][j] = 0;
+          if (problem->costs[i][j] < minValue)
+            {
+              minIndex = i;
+              minValue = problem->costs[i][j];
+            }
+        }
 
      problem->x[minIndex][j] = 1;
     }
 
-  for (i = 0; i < problem->m; i++)
-    {
-      printf ("\n");
+  // for (i = 0; i < problem->m; i++)
+  //   {
+  //     printf ("\n");
 
-      for (j = 0; j < problem->n; j++)
-	{
-	  printf ("%d ", problem->x[i][j]);
-	}
-    }
+  //     for (j = 0; j < problem->n; j++)
+  //   	{
+  //   	  printf ("%d ", problem->x[i][j]);
+  //   	}
+  //   }
 
-  printf ("\n");
+  // printf ("\n");
 }
 
 void
 gap_get_costs_with_relaxiation(Problem * problem)
 {
-    printf("-----costs: \n");
+    // printf("-----costs: \n");
 
     for (int i = 0; i < problem->m; ++i)
     {
         for (int j = 0; j < problem->n; ++j)
         {
-          problem->costs[i][j] = problem->c[i][j] - problem->u[i] * problem->a[i][j];
-          printf("%d ", problem->costs[i][j] );
+          problem->costs[i][j] = problem->c[i][j] - ( problem->u[i] * problem->a[i][j] );
+          // printf("%f ", problem->costs[i][j] );
         }
-    printf("\n");
+    // printf("\n");
     }
 }
 
@@ -152,12 +153,12 @@ gap_are_constraints_satisfied (Problem * problem)
 
       if(sum >= problem->b[i])
       {
-        printf("Constraints not satisifed!\n");
+        printf("Constraints not satisfied!\n");
         return 0;
       }
     }
 
-    printf("Constraints satisifed!\n");
+    printf("Constraints satisfied!\n");
     return 1;
 }
 
@@ -175,14 +176,14 @@ gap_are_lagrangian_constraints_satisfied (Problem * problem)
           sum += problem->a[i][j] * problem->x[i][j];
         }
 
-      if( problem->u[i] * (sum - problem->b[i]) != 0)
+      if( problem->u[i] * (sum - problem->b[i]) != 0.0)
       {
-        printf("Lagrangian constraints not satisifed!\n");
+        printf("Lagrangian constraints not satisfied!\n");
         return 0;
       }
     }
 
-    printf("Lagrangian constraints satisifed!\n");
+    printf("Lagrangian constraints satisfied!\n");
     return 1;
 }
 
@@ -222,19 +223,26 @@ gap_subgradient(Problem * problem)
 {
 
   int maxIter = 150;
-  float alpha = 1;
+  float alpha = 2;
   int delta = 20; //after delta iteration alpha = alpha/2
   int trials = 0;
-  float lb = -999;
-  int lu;
+  double lb = -999;
+  double lu;
   int iter = 1;
   int* y;
-  int step_size;
+  double step_size;
   float res;
-  float lz =  lb * 0.3;
+  double lz =  3;
+  int** xOpt = malloc (problem->m * sizeof (int *));
+
+  for (int i = 0; i < problem->m; i++)
+    {
+      xOpt[i] = calloc (problem->n, sizeof (int));
+    }
 
   while(iter <= maxIter)
   {
+    // char x = getchar();
 
     gap_get_costs_with_relaxiation(problem);
 
@@ -242,13 +250,13 @@ gap_subgradient(Problem * problem)
 
     lu = gap_calcuate_lagrangian_function(problem);
 
-    printf("primal solution: %d\n", gap_calculate_solution(problem));
 
     if(lu > lb)
     {
-      lb = lu;
-      trials = 0;
-      lz = lb < 0.0 ? (-lb * 0.3) : lb * 0.3;
+        lb = lu;
+        trials = 0;
+        // lz = lb < 0.0 ? (-lb * 0.3) : lb * 0.3;
+        copyMatrix(problem->x, xOpt, problem->m, problem->n);
     }
 
     //solution x is optimal -> STOP
@@ -259,15 +267,16 @@ gap_subgradient(Problem * problem)
     }
 
     y = gap_calculate_subgradient_stepsize_vector(problem);
-    step_size = gap_calculate_subgradient_stepsize(y, problem->m);
+    step_size = (double)gap_calculate_subgradient_stepsize(y, problem->m);
     
     //definisci nuovi u
     for (int i = 0; i < problem->m; ++i)
     {
 
-      res = problem->u[i] - alpha * ((float) lz /step_size) * y[i];
-      printf("res: %f = %f - (%f * (%f / %d ) * %d \n", res, problem->u[i], alpha ,lz, step_size, y[i]);
+      res = problem->u[i] - alpha * ((lz-lb) /step_size) * y[i];
+      // printf("res: %f = %f - (%f * (%f / %f ) * %d \n", res, problem->u[i], alpha ,lz, step_size, y[i]);
       problem->u[i] = res < 0.0 ? res : 0.0;
+      // printf("u: %f\n", problem->u[i]);
     }
 
     iter++;   
@@ -278,6 +287,23 @@ gap_subgradient(Problem * problem)
       trials = 0;
     }
   }
+
+  copyMatrix(xOpt, problem->x, problem->m, problem->n);
+
   printf("Exit subgradient function...maxIter limit reached!\n");
+  printf("x: \n");
+
+  for (int i = 0; i < problem->m; i++)
+    {
+      printf ("\n");
+
+      for (int j = 0; j < problem->n; j++)
+  {
+    printf ("%d ", problem->x[i][j]);
+  }
+    }
+
+  printf ("\n");
+
   return 1;
 }

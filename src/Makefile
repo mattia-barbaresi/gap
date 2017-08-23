@@ -25,7 +25,7 @@ FLAGS+= -pipe -O3 -march=native -DNDEBUG
 endif
 
 all: array_list.o array_stack.o gap.o hash_set.o main.o problem.o util.o
-	$(CC) $(FLAGS) array_list.o array_stack.o gap.o hash_set.o main.o problem.o util.o -o main
+	$(CC) $(FLAGS) array_list.o array_stack.o gap.o hash_set.o main.o problem.o util.o -lm -o main
 
 array_list.o: array_list.h array_list.c util.h
 	$(CC) $(FLAGS) array_list.c -c -o array_list.o

@@ -58,4 +58,6 @@ typedef int (*Comparator) (void *one, void *other);
 
 typedef int (*HashFunction) (void *element);
 
+void copyMatrix(int** a, int** b, int row, int col);
+
 #endif

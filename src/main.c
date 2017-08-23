@@ -144,8 +144,8 @@ main (int argc, char **argv)
 	  	gap_subgradient (array_list_get (problems, i));
   	}
 
-  array_list_clear (problems, (Destructor) gap_problem_free);
-  array_list_free (problems);
+  // array_list_clear (problems, (Destructor) gap_problem_free);
+  // array_list_free (problems);
 
   return EXIT_SUCCESS;
 }
