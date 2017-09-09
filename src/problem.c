@@ -141,6 +141,8 @@ gap_problem_print (Problem * problem)
 	  printf ("%d%s", problem->x[i][j], (j < (problem->n - 1) ? " " : "\n"));
 	}
     }
+
+  printf ("\n\n");
 }
 
 ArrayList *

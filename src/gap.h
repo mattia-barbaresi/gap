@@ -20,15 +20,11 @@
 
 #include "problem.h"
 
-int gap_branch_and_bound ();
-
-int gap_lower_bound ();
-
 //calculates the value of the lagrangian function
 double gap_calcuate_lagrangian_function (Problem * problem);
 
 //calculates initial solution for first relaxation
-void gap_calculate_initial_lagrangian (Problem * problem);
+void gap_calculate_lagrangian (Problem * problem);
 
 //calculates the value of the objective function
 int gap_calculate_solution (Problem * problem);

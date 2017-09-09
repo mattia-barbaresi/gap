@@ -139,13 +139,28 @@ main (int argc, char **argv)
 
   for (i = 0; i < array_list_size (problems); i++)
 	{
-		printf("\nPROBLEM %d   ===================================\n",i);
+    int res;
 
-	  	gap_subgradient (array_list_get (problems, i));
+		printf("\nPROBLEM %d   ===================================\n\n",i);
+
+		// gap_problem_print(array_list_get (problems, i));
+	  res = gap_subgradient (array_list_get (problems, i));
+
+    if(res==0)
+    {
+      //optimal solution found
+    }
+    else
+    {
+      //b&b
+    }
+
+		// gap_problem_print(array_list_get (problems, i));		
+	  	gap_calculate_solution(array_list_get (problems, i));
   	}
 
-  // array_list_clear (problems, (Destructor) gap_problem_free);
-  // array_list_free (problems);
+  array_list_clear (problems, (Destructor) gap_problem_free);
+  array_list_free (problems);
 
   return EXIT_SUCCESS;
 }
