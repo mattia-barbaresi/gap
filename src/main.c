@@ -144,7 +144,7 @@ main (int argc, char **argv)
 		printf("\nPROBLEM %d   ===================================\n\n",i);
 
 		// gap_problem_print(array_list_get (problems, i));
-	  res = gap_subgradient (array_list_get (problems, i));
+	  res = gap_subgradient_a (array_list_get (problems, i));
 
     if(res==0)
     {

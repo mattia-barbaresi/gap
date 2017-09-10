@@ -20,26 +20,13 @@
 
 #include "problem.h"
 
-//calculates the value of the lagrangian function
-double gap_calcuate_lagrangian_function (Problem * problem);
-
-//calculates initial solution for first relaxation
-void gap_calculate_lagrangian (Problem * problem);
-
 //calculates the value of the objective function
 int gap_calculate_solution (Problem * problem);
 
-//checks if constraint are satisfied
-int gap_are_constraints_satisfied (Problem * problem);
+//run subgradient with constraints on item relaxed
+int gap_subgradient_a(Problem * problem);
 
-int gap_are_lagrangian_constraints_satisfied (Problem * problem);
-
-int* gap_calculate_subgradient_stepsize_vector(Problem * problem);
-
-int gap_calculate_subgradient_stepsize(int* y, int m);
-
-int gap_subgradient(Problem * problem);
-
-void gap_get_costs_with_relaxiation(Problem * problem);
+//run subgradient with constraints on capacities relaxed
+int gap_subgradient_b(Problem * problem);
 
 #endif

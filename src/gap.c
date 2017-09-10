@@ -69,7 +69,7 @@ gap_calcuate_lagrangian_function (Problem * problem)
 }
 
 void
-gap_calculate_lagrangian (Problem * problem)
+gap_calculate_lagrangian_a (Problem * problem)
 {
   int i;
   int j;
@@ -107,6 +107,27 @@ gap_calculate_lagrangian (Problem * problem)
   //   }
 
   // printf ("\n");
+}
+
+void
+gap_calculate_lagrangian_b (Problem * problem)
+{
+  double sum;
+
+  for(int i = 0; i< problem->m; i++)
+  {
+    sum = 0.0;
+    for(int j = 0; j< problem->n; j++)
+    {
+      if(problem->costs[i][j] < 0)
+      {
+        problem->x[i][j] = 1;
+        sum += problem->a[i][j]; 
+      }
+    }
+
+  }
+
 }
 
 void
@@ -246,7 +267,7 @@ invert_for_max_problem(Problem * problem){
 }
 
 int
-gap_subgradient(Problem * problem)
+gap_subgradient_b(Problem * problem)
 {
 
   int maxIter = 350;
@@ -274,7 +295,7 @@ gap_subgradient(Problem * problem)
   while(iter <= maxIter)
   {
     gap_get_costs_with_relaxiation(problem);
-    gap_calculate_lagrangian(problem);
+    gap_calculate_lagrangian_a(problem);
     lu = gap_calcuate_lagrangian_function(problem);
     // gap_problem_print(problem);    
     // char x = getchar();
@@ -321,4 +342,19 @@ gap_subgradient(Problem * problem)
   copyMatrix(xOpt, problem->x, problem->m, problem->n);
 
   return 1;
+}
+
+int
+gap_subgradient_a (Problem *problem)
+{
+
+  //rilassamento vincoli
+  for (int i = 0; i < problem->m; ++i)
+  {
+      for (int j = 0; j < problem->n; ++j)
+      {
+        problem->costs[i][j] = problem->c[i][j] - problem->u[i];
+      }
+  }
+  return 0;
 }
