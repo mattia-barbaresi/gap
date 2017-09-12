@@ -160,7 +160,15 @@ gap_problems_from_file (char *fname)
 
   /* *INDENT-OFF* */
   if ((fp = fopen (fname, "r")) == NULL) goto io_exception;
-  if (fscanf (fp, "%d", &n_problems) == EOF) goto io_exception;
+
+  if((fname[11]=='c' || fname[11]=='d' || fname[11]=='e') && fname[12]=='/'){
+    n_problems=1;
+  }
+  else
+  {
+    if (fscanf (fp, "%d", &n_problems) == EOF) goto io_exception;
+  }
+
   if ((problems = array_list_new (n_problems)) == NULL) goto memory_exception;
 
   for (k = 0; k < n_problems; k++)
@@ -189,6 +197,10 @@ gap_problems_from_file (char *fname)
 	{
 	  if (fscanf (fp, "%d", &(problem->b[i])) == EOF) goto io_exception;
 	}
+
+  if((fname[11]=='c' || fname[11]=='d' || fname[11]=='e') && fname[12]=='/'){
+    if (fscanf (fp, "%d", &(problem->lb)) == EOF) goto io_exception;
+  }
 
       if (!array_list_add (problems, problem)) goto memory_exception;
     }

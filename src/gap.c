@@ -49,7 +49,7 @@ gap_calculate_solution (Problem * problem)
 }
 
 double
-gap_calcuate_lagrangian_function (Problem * problem)
+gap_calcuate_lagrangian_function_b (Problem * problem)
 {
   double cost = 0;
   int i;
@@ -67,9 +67,99 @@ gap_calcuate_lagrangian_function (Problem * problem)
   // printf ("valore soluzione lagrnagiana: %f\n", cost);
   return cost;
 }
+double
+gap_calcuate_lagrangian_function_a (Problem * problem)
+{
+  double cost = 0;
+  int i;
+  int j;
 
+  for (i = 0; i < problem->m; i++)
+    {
+      for (j = 0; j < problem->n; j++)
+        {
+          cost += problem->costs[i][j] * problem->x[i][j];
+        }
+        cost += problem->u[i];
+    }
+
+  return cost;
+}
+
+//dinamica per gli m knapsack
+//ricursione forward
 void
 gap_calculate_lagrangian_a (Problem * problem)
+{
+  int k,val;
+
+  //init f(k,q)
+  int** f = malloc ((problem->n + 1) * sizeof (int *)); //k
+
+  //ciclo sui contenitori
+  for (int knap = 0; knap < problem->m; ++knap)
+  {
+    //allocazione dinamica per f(k,q) dove q = 1,2,..,b
+    for (int ii = 0; ii <= problem->n; ii++)
+    {
+      f[ii] = malloc ((problem->b[knap]+1) * sizeof (int)); //q
+    }
+
+    //init f(0,q)
+    f[0][0] = 0;
+    for (int z = 1; z <= problem->b[knap]; ++z)
+    {
+      f[0][z] = -9999; // -inf
+    }
+
+    k = 0;
+
+    //ciclo su k
+    while(k != problem->n)
+    {
+      //init f(k+1,q)
+      for (int z = 0; z <= problem->b[knap]; ++z)
+      {
+        f[k+1][z] = -9999; // -inf
+      }
+
+      for (int q = 0; q <= problem->b[knap]; ++q)
+      {
+        if(f[k][q] >= 0)
+        {
+          f[k+1][q] = f[k+1][q] > f[k][q] ? f[k+1][q] : f[k][q];
+
+          val = q + problem->a[knap][k];
+
+          if(val <= problem->b[knap])
+          {
+            f[k+1][val] = f[k+1][val] > f[k][q] + problem->c[knap][k] ? f[k+1][val] : f[k][q] + problem->c[knap][k];
+          }
+        }
+      }
+      k++;
+    }
+
+    int b = problem->b[knap];
+
+    //calculate solution
+    for (k = problem->n; k > 0; --k)
+    {
+      if( f[k][b] > f[k-1][b] )
+      {
+        problem->x[knap][k-1] = 1;
+        b -= problem->a[knap][k-1];
+      }
+      else
+      {
+        problem->x[knap][k-1] = 0;
+      }
+    }
+  }
+}
+
+void
+gap_calculate_lagrangian_b (Problem * problem)
 {
   int i;
   int j;
@@ -107,27 +197,6 @@ gap_calculate_lagrangian_a (Problem * problem)
   //   }
 
   // printf ("\n");
-}
-
-void
-gap_calculate_lagrangian_b (Problem * problem)
-{
-  double sum;
-
-  for(int i = 0; i< problem->m; i++)
-  {
-    sum = 0.0;
-    for(int j = 0; j< problem->n; j++)
-    {
-      if(problem->costs[i][j] < 0)
-      {
-        problem->x[i][j] = 1;
-        sum += problem->a[i][j]; 
-      }
-    }
-
-  }
-
 }
 
 void
@@ -267,24 +336,95 @@ invert_for_max_problem(Problem * problem){
 }
 
 int
-gap_subgradient_b(Problem * problem)
+gap_subgradient_a(Problem *problem)
 {
+  double lu=0;
+  double lb=-99999999;
 
   int maxIter = 350;
   float alpha = 1;
-  int delta = 20; //after delta iteration alpha = alpha/2
+  int delta = 20;
   int trials = 0;
-  invert_for_max_problem(problem);
+  // invert_for_max_problem(problem);
 
-  //calculate banal lb 
-  double lb = -999999; 
-
-  double lu;
   int iter = 0;
   int* y;
   double step_size;
   float res;
   double lz = 300;
+
+  while(iter <= maxIter)
+  {
+
+    //rilassamento vincoli
+    for (int i = 0; i < problem->m; ++i)
+    {
+      for (int j = 0; j < problem->n; ++j)
+      {
+        problem->costs[i][j] = problem->c[i][j] - problem->u[i];
+      }
+    }
+
+    //risolvo con dinamica
+    gap_calculate_lagrangian_a(problem);
+
+    //calculate L(u)
+    lu = gap_calcuate_lagrangian_function_a(problem);
+
+    if(lu > lb)
+    {
+      lb=lu;
+      //verificasoluzione ottima
+    }
+
+    //aggiorno step size
+    y = gap_calculate_subgradient_stepsize_vector(problem);
+    step_size = (double)gap_calculate_subgradient_stepsize(y, problem->m);
+    
+    //update penalità
+    // printf("u:   ");
+    for (int i = 0; i < problem->m; ++i)
+    {
+      res = problem->u[i] - alpha * (1/*(lz - lu)*//step_size) * y[i];
+      problem->u[i] = res < 0.0 ? res : 0.0;
+      // printf("%f ",problem->u[i]);
+    }
+    // printf("\n");
+
+    iter++;
+    trials++;
+
+    if(trials == delta)
+    {
+      alpha = alpha * 0.5;
+      trials = 0;
+    }
+  }
+  return 1;
+}
+
+int
+gap_subgradient_b(Problem * problem)
+{
+
+  int iter = 0;
+  int maxIter = 150;
+  float alpha = 1;
+  int delta = 20;
+  int trials = 0;
+  // invert_for_max_problem(problem);
+ 
+  double lb = -999999; 
+  double lu;
+  int* y;
+  double step_size;
+  float res;
+
+  //UB
+  //TODO: calcolarne uno in qualche modo
+  double lz = 3;
+  //for gap of type c, d, e for size [5,10,20] X [100,200]
+  //double lz =problem->lb; 
 
   int** xOpt = malloc (problem->m * sizeof (int *));
 
@@ -295,8 +435,8 @@ gap_subgradient_b(Problem * problem)
   while(iter <= maxIter)
   {
     gap_get_costs_with_relaxiation(problem);
-    gap_calculate_lagrangian_a(problem);
-    lu = gap_calcuate_lagrangian_function(problem);
+    gap_calculate_lagrangian_b(problem);
+    lu = gap_calcuate_lagrangian_function_b(problem);
     // gap_problem_print(problem);    
     // char x = getchar();
 
@@ -304,7 +444,6 @@ gap_subgradient_b(Problem * problem)
     {
       printf("lu: %f\n",lu );
       lb = lu;
-      // printf("lb: %f \n", lb);
 
       trials = 0;
       copyMatrix(problem->x, xOpt, problem->m, problem->n);
@@ -324,7 +463,7 @@ gap_subgradient_b(Problem * problem)
     // printf("u:   ");
     for (int i = 0; i < problem->m; ++i)
     {
-      res = problem->u[i] - alpha * (1/*(lz - lu)*//step_size) * y[i];
+      res = problem->u[i] - alpha * ((lz - lu)/step_size) * y[i];
       problem->u[i] = res < 0.0 ? res : 0.0;
       // printf("%f ",problem->u[i]);
     }
@@ -334,7 +473,7 @@ gap_subgradient_b(Problem * problem)
     trials++;
 
     if(trials == delta){
-      alpha = alpha * 0.5;
+      alpha = alpha * 0.75;
       trials = 0;
     }
   }
@@ -342,19 +481,4 @@ gap_subgradient_b(Problem * problem)
   copyMatrix(xOpt, problem->x, problem->m, problem->n);
 
   return 1;
-}
-
-int
-gap_subgradient_a (Problem *problem)
-{
-
-  //rilassamento vincoli
-  for (int i = 0; i < problem->m; ++i)
-  {
-      for (int j = 0; j < problem->n; ++j)
-      {
-        problem->costs[i][j] = problem->c[i][j] - problem->u[i];
-      }
-  }
-  return 0;
 }
