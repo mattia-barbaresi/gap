@@ -23,10 +23,7 @@
 //calculates the value of the objective function
 int gap_calculate_solution (Problem * problem);
 
-//run subgradient with constraints on item relaxed
-int gap_subgradient_a(Problem * problem);
-
-//run subgradient with constraints on capacities relaxed
-int gap_subgradient_b(Problem * problem);
+//runs subgradient
+int gap_subgradient(Problem * problem);
 
 #endif
