@@ -33,15 +33,12 @@ gap_calculate_solution (Problem * problem)
   int i;
   int j;
 
-  // printf("x: \n");
   for (i = 0; i < problem->m; i++)
   {
     for (j = 0; j < problem->n; j++)
   	{
   	  cost += problem->c[i][j] * problem->x[i][j];
-        // printf("%d ", problem->x[i][j]);
   	}
-      // printf("\n");
   }
   printf ("valore soluzione gap: %d\n", cost);
   return cost;
@@ -55,13 +52,13 @@ gap_calcuate_lagrangian_function_a (Problem * problem)
   int i;
   int j;
 
-  for (i = 0; i < problem->m; i++)
+  for (j = 0; j < problem->n; j++)
   {
-    for (j = 0; j < problem->n; j++)
+    for (i = 0; i < problem->m; i++)
     {
       cost += problem->costs[i][j] * problem->x[i][j];
     }
-    cost += problem->u[i];
+    cost += problem->u[j];
   }
 
   return cost;
@@ -78,13 +75,12 @@ gap_calcuate_lagrangian_function_b (Problem * problem)
   for (i = 0; i < problem->m; i++)
     {
       for (j = 0; j < problem->n; j++)
-        {
-          cost += problem->costs[i][j] * problem->x[i][j];
-        }
-        cost += problem->u[i] * problem->b[i];
+      {
+        cost += problem->costs[i][j] * problem->x[i][j];
+      }
+      cost += problem->u[i] * problem->b[i];
     }
 
-  // printf ("valore soluzione lagrnagiana: %f\n", cost);
   return cost;
 }
 
@@ -188,7 +184,6 @@ gap_calculate_lagrangian_b (Problem * problem)
   {
     minIndex = 0;
     minValue = problem->costs[0][j];
-
     for (i = 0; i < problem->m; i++)
       {
         problem->x[i][j] = 0;
@@ -198,31 +193,19 @@ gap_calculate_lagrangian_b (Problem * problem)
             minValue = problem->costs[i][j];
           }
       }
-
    problem->x[minIndex][j] = 1;
   }
-  // print x
-  // for (i = 0; i < problem->m; i++)
-  //   {
-  //     printf ("\n");
-
-  //     for (j = 0; j < problem->n; j++)
-  //   	{
-  //   	  printf ("%d ", problem->x[i][j]);
-  //   	}
-  //   }
-  // printf ("\n");
 }
 
 // a: calculates costs = c - u
 void
 gap_get_costs_with_relaxiation_a(Problem * problem)
 {
-  for (int i = 0; i < problem->m; ++i)
+  for (int j = 0; j < problem->n; ++j)
   {
-    for (int j = 0; j < problem->n; ++j)
+    for (int i = 0; i < problem->m; ++i)
     {
-      problem->costs[i][j] = problem->c[i][j] - problem->u[i];
+      problem->costs[i][j] = problem->c[i][j] - problem->u[j];
     }
   }
 }
@@ -246,10 +229,10 @@ gap_are_constraints_satisfied_a (Problem * problem)
 {
    int i,j,sum;
 
-   for (i = 0; i < problem->m; i++)
+    for (j = 0; j < problem->n; j++)
     {
       sum = 0;
-      for (j = 0; j < problem->n; j++)
+      for (i = 0; i < problem->m; i++)
       {
         sum += problem->x[i][j];
       }
@@ -294,15 +277,14 @@ gap_are_lagrangian_constraints_satisfied_a (Problem * problem)
 {
    int i,j,sum;
 
-   for (i = 0; i < problem->m; i++)
+    for (j = 0; j < problem->n; j++)
     {
       sum = 0;
-
-      for (j = 0; j < problem->n; j++)
+      for (i = 0; i < problem->m; i++)
       {
         sum += problem->x[i][j];
       }
-      if( problem->u[i] * (sum - 1) != 0.0)
+      if( problem->u[j] * (sum - 1) != 0.0)
       {
         // lagrangian constraints not satisfied
         // printf("lagrangian constraints not satisfied: %d\n", i);
@@ -342,16 +324,16 @@ int*
 gap_calculate_subgradient_stepsize_vector_a (Problem * problem)
 {
   int sum;
-  int* y = calloc (problem->m, sizeof (int));
+  int* y = calloc (problem->n, sizeof (int));
 
-  for (int i = 0; i < problem->m; i++)
+  for (int j = 0; j < problem->n; j++)
   {
     sum = 0;
-    for (int j = 0; j < problem->n; j++)
+    for (int i = 0; i < problem->m; i++)
       {
         sum += problem->a[i][j] * problem->x[i][j];
       }
-    y[i] = sum - problem->b[i];
+    y[j] = sum - problem->b[j];
   }
   return y;
 }
@@ -361,15 +343,15 @@ int*
 gap_calculate_subgradient_stepsize_vector_b (Problem * problem)
 {
   int sum;
-  int* y = calloc (problem->m, sizeof (int));
+  int* y = calloc (problem->n, sizeof (int));
 
   for (int i = 0; i < problem->m; i++)
   {
     sum = 0;
     for (int j = 0; j < problem->n; j++)
-      {
-        sum += problem->a[i][j] * problem->x[i][j];
-      }
+    {
+      sum += problem->a[i][j] * problem->x[i][j];
+    }
     y[i] = sum - problem->b[i];
   }
   return y;
@@ -431,7 +413,7 @@ gap_subgradient (Problem * problem)
   int delta = 20;
   int trials = 0;
   int result = 0;
-  invert_for_max_problem(problem);
+  // invert_for_max_problem(problem);
  
   double lb = -999999; 
   double lu;
@@ -498,18 +480,26 @@ gap_subgradient (Problem * problem)
     // b
     y = gap_calculate_subgradient_stepsize_vector_b(problem);
 
+    // step size:
+    // a
+    // step_size = (double)gap_calculate_subgradient_stepsize(y, problem->n);
+    // b
     step_size = (double)gap_calculate_subgradient_stepsize(y, problem->m);
 
+    //update u:
+    // a
+    // for (int j = 0; j < problem->n; ++j)
+    // {
+    //   res = problem->u[j] - alpha * ((lz - lu)/step_size) * y[j];
+    //   problem->u[i] = res;
+    // }
+    // b
     for (int i = 0; i < problem->m; ++i)
     {
       res = problem->u[i] - alpha * ((lz - lu)/step_size) * y[i];
-
-      //update u:
-      // a
-      // problem->u[i] = res;
-      // b
       problem->u[i] = res < 0.0 ? res : 0.0; //min
     }
+
 
     iter++;
     trials++;
