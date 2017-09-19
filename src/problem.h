@@ -30,7 +30,7 @@ typedef struct
   float *u;
   int m;
   int n;
-  int lb;
+  double lb;
 } Problem;
 
 void gap_problem_free (Problem * problem);

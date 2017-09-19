@@ -415,7 +415,6 @@ gap_subgradient (Problem * problem)
   int result = 0;
   // invert_for_max_problem(problem);
  
-  double lb = -999999; 
   double lu;
   int* y;
   double step_size;
@@ -425,14 +424,17 @@ gap_subgradient (Problem * problem)
   //TODO: calcolarne uno in qualche modo
   //----------------------------------------------------------
   // for gap of type c, d, e ...and size [5,10,20] X [100,200]:
-  //  double lz = problem->lb; 
+  // double lz = problem->lb; 
   //----------------------------------------------------------
   double lz = 3;
+
+  //init lb
+  problem->lb = -999999; 
 
   int** xOpt = malloc (problem->m * sizeof (int *));
 
   for (int i = 0; i < problem->m; i++)
-      xOpt[i] = calloc (problem->n, sizeof (int));
+    xOpt[i] = calloc (problem->n, sizeof (int));
 
   while(iter <= maxIter)
   {
@@ -454,10 +456,10 @@ gap_subgradient (Problem * problem)
     // b
     lu = gap_calcuate_lagrangian_function_b(problem);
 
-    if(lu > lb)
+    if(lu > problem->lb)
     {
       printf("lu: %f\n",lu );
-      lb = lu;
+      problem->lb = lu;
       trials = 0;
       copyMatrix(problem->x, xOpt, problem->m, problem->n);
 
@@ -500,15 +502,15 @@ gap_subgradient (Problem * problem)
       problem->u[i] = res < 0.0 ? res : 0.0; //min
     }
 
-
     iter++;
     trials++;
 
     if(trials == delta){
-      alpha = alpha * 0.75;
+      alpha = alpha * 0.5;
       trials = 0;
     }
   }
+
   copyMatrix(xOpt, problem->x, problem->m, problem->n);
   return 1;
 }

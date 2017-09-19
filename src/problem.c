@@ -199,7 +199,7 @@ gap_problems_from_file (char *fname)
 	}
 
   if((fname[11]=='c' || fname[11]=='d' || fname[11]=='e') && fname[12]=='/'){
-    if (fscanf (fp, "%d", &(problem->lb)) == EOF) goto io_exception;
+    if (fscanf (fp, "%lf", &(problem->lb)) == EOF) goto io_exception;
   }
 
       if (!array_list_add (problems, problem)) goto memory_exception;

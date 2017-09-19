@@ -142,20 +142,20 @@ main (int argc, char **argv)
 
 		printf("\n PROBLEM %d   ===================================\n\n",i);
 
-		// gap_problem_print(array_list_get (problems, i));
 	  res = gap_subgradient (array_list_get (problems, i));
-
     if(res == 0)
     {
       //optimal solution found
+      printf("Exit subgradient with optimal solution!\n");
     }
     else
     {
       //b&b
+      gap_calculate_solution (array_list_get (problems, i));
+      // gap_bab(array_list_get (problems, i));
     }
 
-		gap_problem_print(array_list_get (problems, i));		
-	  gap_calculate_solution (array_list_get (problems, i));
+    // gap_problem_print(array_list_get (problems, i));
   }
 
   array_list_clear (problems, (Destructor) gap_problem_free);
