@@ -426,7 +426,7 @@ gap_subgradient (Problem * problem)
   // for gap of type c, d, e ...and size [5,10,20] X [100,200]:
   // double lz = problem->lb; 
   //----------------------------------------------------------
-  double lz = 3;
+  double lz = 500;
 
   //init lb
   problem->lb = -999999; 
@@ -513,4 +513,13 @@ gap_subgradient (Problem * problem)
 
   copyMatrix(xOpt, problem->x, problem->m, problem->n);
   return 1;
+}
+
+
+// function for branch and bound
+int
+gap_bab(Problem * problem)
+{
+  printf("TODO: gap_bab no code found!\n");
+  return 0;
 }

@@ -23,7 +23,10 @@
 //calculates the value of the objective function
 int gap_calculate_solution (Problem * problem);
 
-//runs subgradient
+//subgradient
 int gap_subgradient(Problem * problem);
+
+//b&b
+int gap_bab(Problem * problem);
 
 #endif
