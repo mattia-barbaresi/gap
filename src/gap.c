@@ -386,7 +386,7 @@ gap_is_solution_optimal_b (Problem * problem)
   return 1;
 }
 
-// function for reversing cost of problem:
+// inverts costs of problem:
 //  Max = - Min
 void
 invert_for_max_problem (Problem * problem)
@@ -396,7 +396,7 @@ invert_for_max_problem (Problem * problem)
         problem->c[i][j] = -(problem->c[i][j]);
 }
 
-// function for subgradient
+// subgradient
 //----------------------------------------------------------
 //
 // NOTA:
@@ -515,8 +515,7 @@ gap_subgradient (Problem * problem)
   return 1;
 }
 
-
-// function for branch and bound
+// branch and bound
 int
 gap_bab(Problem * problem)
 {

@@ -151,7 +151,7 @@ main (int argc, char **argv)
       gap_bab(array_list_get (problems, i));
 
     }
-    
+
     //print solution
     gap_calculate_solution (array_list_get (problems, i));
     // gap_problem_print(array_list_get (problems, i));
