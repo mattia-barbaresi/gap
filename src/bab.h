@@ -15,15 +15,17 @@
  * along with gap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GAP_H
-#define _GAP_H
+/**
+ * @file bab.h
+ * @brief Ffunctions for branch and bound.
+ */
+
+#ifndef _BAB_H
+#define _BAB_H
 
 #include "problem.h"
 
-//calculates the value of the objective function
-int gap_calculate_solution (Problem * problem);
+//b&b
+int gap_bab(Problem * problem);
 
-// invert costs of problem
-void
-invert_for_max_problem (Problem * problem);
 #endif

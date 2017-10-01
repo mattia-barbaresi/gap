@@ -17,10 +17,10 @@
 
 #include "util.h"
 
- void
- copyMatrix(int** source, int** dest, int row, int col)
- {
- 	for (int i = 0; i < row; ++i)
- 		for (int j = 0; j < col; ++j)
- 			dest[i][j] = source[i][j];
- }
+void
+copyMatrix(int** source, int** dest, int row, int col)
+{
+	for (int i = 0; i < row; ++i)
+		for (int j = 0; j < col; ++j)
+			dest[i][j] = source[i][j];
+}

@@ -15,15 +15,12 @@
  * along with gap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GAP_H
-#define _GAP_H
+#ifndef _SUBGRADIENT_H
+#define _SUBGRADIENT_H
 
 #include "problem.h"
 
-//calculates the value of the objective function
-int gap_calculate_solution (Problem * problem);
+//subgradient
+int gap_subgradient(Problem * problem);
 
-// invert costs of problem
-void
-invert_for_max_problem (Problem * problem);
 #endif

@@ -26,6 +26,8 @@
 #include <unistd.h>
 
 #include "gap.h"
+#include "subgradient.h"
+#include "bab.h"
 #include "problem.h"
 #include "util.h"
 
