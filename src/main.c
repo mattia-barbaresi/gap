@@ -151,7 +151,6 @@ main (int argc, char **argv)
     {
       //b&b
       gap_bab(array_list_get (problems, i));
-
     }
 
     //print solution

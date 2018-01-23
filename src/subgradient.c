@@ -8,6 +8,7 @@
 #include "subgradient.h"
 #include "problem.h"
 #include "util.h"
+#include "gap.h"
 
 // a: calculates cost * x + u
 double
@@ -273,7 +274,7 @@ gap_are_lagrangian_constraints_satisfied_b (Problem * problem)
       {
         sum += problem->a[i][j] * problem->x[i][j];
       }
-      if( problem->u[i] * (sum - problem->b[i]) < 0.0)
+      if( problem->u[i] * (sum - problem->b[i]) != 0.0)
       {
         // lagrangian constraints not satisfied
         // printf("lagrangian constraints not satisfied: %d\n", i);
@@ -368,7 +369,7 @@ gap_subgradient (Problem * problem)
   int delta = 20;
   int trials = 0;
   int result = 0;
-  // invert_for_max_problem(problem);
+  invert_for_max_problem(problem);
  
   double lu;
   int* y;
@@ -379,7 +380,7 @@ gap_subgradient (Problem * problem)
   //TODO: calcolarne uno in qualche modo
   //----------------------------------------------------------
   // for gap of type c, d, e ...and size [5,10,20] X [100,200]:
-  // double lz = problem->lb; 
+  // use double lz = problem->lb; 
   //----------------------------------------------------------
   double lz = 500;
 
@@ -453,7 +454,7 @@ gap_subgradient (Problem * problem)
     // b
     for (int i = 0; i < problem->m; ++i)
     {
-      res = problem->u[i] - alpha * ((lz - lu)/step_size) * y[i];
+      res = problem->u[i] - alpha * (/*(lz - lu)*/(-0.3*lu)/step_size) * y[i];
       problem->u[i] = res < 0.0 ? res : 0.0; //min
     }
 
