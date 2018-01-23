@@ -156,9 +156,9 @@ gap_calculate_lagrangian_b (Problem * problem)
 void
 gap_get_costs_with_relaxiation_a(Problem * problem)
 {
-  for (int j = 0; j < problem->n; ++j)
+  for (int i = 0; i < problem->m; ++i)
   {
-    for (int i = 0; i < problem->m; ++i)
+    for (int j = 0; j < problem->n; ++j)
     {
       problem->costs[i][j] = problem->c[i][j] - problem->u[j];
     }
@@ -169,9 +169,9 @@ gap_get_costs_with_relaxiation_a(Problem * problem)
 void
 gap_get_costs_with_relaxiation_b (Problem * problem)
 {
-  for (int i = 0; i < problem->m; ++i)
+  for (int j = 0; j < problem->n; ++j)
   {
-    for (int j = 0; j < problem->n; ++j)
+    for (int i = 0; i < problem->m; ++i)
     {
       problem->costs[i][j] = problem->c[i][j] - ( problem->u[i] * problem->a[i][j] );
     }
@@ -381,17 +381,20 @@ gap_subgradient (Problem * problem, char relaxType)
   for (int i = 0; i < problem->m; i++)
     xOpt[i] = calloc (problem->n, sizeof (int));
 
+  // init u
+   if(relaxType == 'a')
+      problem->u = calloc (problem->n, sizeof (float));
+  else if(relaxType == 'b')
+      problem->u = calloc (problem->m, sizeof (float));
+    
   while(iter <= maxIter)
   {
     // init costs for relaxing constraint:
-    if(relaxType == 'a'){
-      problem->u = calloc (problem->n, sizeof (float));
+    if(relaxType == 'a')
       gap_get_costs_with_relaxiation_a(problem);
-    }
-    else if(relaxType == 'b'){
-      problem->u = calloc (problem->m, sizeof (float));
+
+    else if(relaxType == 'b')
       gap_get_costs_with_relaxiation_b(problem);
-    }
 
     // calculate optimal solution for L(u):
     if(relaxType == 'a')
@@ -405,9 +408,9 @@ gap_subgradient (Problem * problem, char relaxType)
     else if(relaxType == 'b')
       lu = gap_calcuate_lagrangian_function_b(problem);
 
+      printf("lu: %f\n",lu );
     if(lu > problem->lb)
     {
-      printf("lu: %f\n",lu );
       problem->lb = lu;
       trials = 0;
       copyMatrix(problem->x, xOpt, problem->m, problem->n);
