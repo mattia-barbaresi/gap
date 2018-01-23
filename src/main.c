@@ -142,7 +142,7 @@ main (int argc, char **argv)
 	{
 		printf("\n PROBLEM %d   ===================================\n\n",i);
 
-    if(gap_subgradient (array_list_get (problems, i)) == 0)
+    if(gap_subgradient (array_list_get (problems, i),'a') == 0)
     {
       //optimal solution found
       printf("Exit subgradient with optimal solution!\n");

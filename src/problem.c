@@ -79,7 +79,6 @@ gap_problem_new (int m, int n)
 
   problem->m = m;
   problem->n = n;
-  problem->u = calloc (m, sizeof (float));
   problem->x = malloc (m * sizeof (int *));
 
   for (i = 0; i < m; i++)

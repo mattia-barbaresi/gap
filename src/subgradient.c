@@ -120,17 +120,6 @@ gap_calculate_lagrangian_a (Problem * problem)
         problem->x[knap][k-1] = 0;
       }
     }
-
-    printf("x: \n");
-    for (int i = 0; i < problem->m; ++i)
-    {
-      for (int j = 0; j < problem->n; ++j)
-      {
-        printf("%d ",problem->x[i][j] );
-      }
-      printf("\n");
-    }
-    printf("\n");
   }
 }
 
@@ -361,7 +350,7 @@ gap_is_solution_optimal_b (Problem * problem)
 //
 //----------------------------------------------------------
 int
-gap_subgradient (Problem * problem)
+gap_subgradient (Problem * problem, char relaxType)
 {
   int iter = 0;
   int maxIter = 150;
@@ -369,20 +358,20 @@ gap_subgradient (Problem * problem)
   int delta = 20;
   int trials = 0;
   int result = 0;
-  invert_for_max_problem(problem);
+  // invert_for_max_problem(problem);
  
   double lu;
   int* y;
   double step_size;
   float res;
 
-  //UB
-  //TODO: calcolarne uno in qualche modo
-  //----------------------------------------------------------
+  // UB
+  // TODO: calcolarne uno in qualche modo
+  // ----------------------------------------------------------
   // for gap of type c, d, e ...and size [5,10,20] X [100,200]:
   // use double lz = problem->lb; 
-  //----------------------------------------------------------
-  double lz = 500;
+  // ----------------------------------------------------------
+  double lz = 2;
 
   //init lb
   problem->lb = -999999; 
@@ -395,22 +384,26 @@ gap_subgradient (Problem * problem)
   while(iter <= maxIter)
   {
     // init costs for relaxing constraint:
-    // a
-    // gap_get_costs_with_relaxiation_a(problem);
-    // b
-    gap_get_costs_with_relaxiation_b(problem);
+    if(relaxType == 'a'){
+      problem->u = calloc (problem->n, sizeof (float));
+      gap_get_costs_with_relaxiation_a(problem);
+    }
+    else if(relaxType == 'b'){
+      problem->u = calloc (problem->m, sizeof (float));
+      gap_get_costs_with_relaxiation_b(problem);
+    }
 
     // calculate optimal solution for L(u):
-    // a
-    // gap_calculate_lagrangian_a(problem);
-    // b
-    gap_calculate_lagrangian_b(problem);
+    if(relaxType == 'a')
+      gap_calculate_lagrangian_a(problem);
+    else if(relaxType == 'b')
+      gap_calculate_lagrangian_b(problem);
 
     // cost of L(u):
-    // a
-    // lu = gap_calcuate_lagrangian_function_a(problem);
-    // b
-    lu = gap_calcuate_lagrangian_function_b(problem);
+    if(relaxType == 'a')
+      lu = gap_calcuate_lagrangian_function_a(problem);
+    else if(relaxType == 'b')
+      lu = gap_calcuate_lagrangian_function_b(problem);
 
     if(lu > problem->lb)
     {
@@ -420,10 +413,10 @@ gap_subgradient (Problem * problem)
       copyMatrix(problem->x, xOpt, problem->m, problem->n);
 
       // solution x is optimal -> STOP:
-      // a
-      // result = gap_is_solution_optimal_a(problem);
-      // b
-      result = gap_is_solution_optimal_b(problem);
+      if(relaxType == 'a')
+        result = gap_is_solution_optimal_a(problem);
+      else if(relaxType == 'b')
+        result = gap_is_solution_optimal_b(problem);
 
       if(result == 0)
       {
@@ -433,29 +426,32 @@ gap_subgradient (Problem * problem)
     }
 
     // step size vector:
-    // a
-    // y = gap_calculate_subgradient_stepsize_vector_a(problem);
-    // b
-    y = gap_calculate_subgradient_stepsize_vector_b(problem);
+    if(relaxType == 'a')
+      y = gap_calculate_subgradient_stepsize_vector_a(problem);
+    else if(relaxType == 'b')
+      y = gap_calculate_subgradient_stepsize_vector_b(problem);
 
     // step size:
-    // a
-    // step_size = (double)gap_calculate_subgradient_stepsize(y, problem->n);
-    // b
-    step_size = (double)gap_calculate_subgradient_stepsize(y, problem->m);
+    if(relaxType == 'a')
+      step_size = (double)gap_calculate_subgradient_stepsize(y, problem->n);
+    else if(relaxType == 'b')
+      step_size = (double)gap_calculate_subgradient_stepsize(y, problem->m);
 
     //update u:
-    // a
-    // for (int j = 0; j < problem->n; ++j)
-    // {
-    //   res = problem->u[j] - alpha * ((lz - lu)/step_size) * y[j];
-    //   problem->u[i] = res;
-    // }
-    // b
-    for (int i = 0; i < problem->m; ++i)
-    {
-      res = problem->u[i] - alpha * (/*(lz - lu)*/(-0.3*lu)/step_size) * y[i];
-      problem->u[i] = res < 0.0 ? res : 0.0; //min
+
+    if(relaxType == 'a'){
+      for (int j = 0; j < problem->n; ++j)
+      {
+        res = problem->u[j] - alpha * ((lz - lu)/step_size) * y[j];
+        problem->u[j] = res;
+      }
+    }
+    else if(relaxType == 'b'){
+      for (int i = 0; i < problem->m; ++i)
+      {
+        res = problem->u[i] - alpha * (/*(lz - lu)*/(-0.3*lu)/step_size) * y[i];
+        problem->u[i] = res < 0.0 ? res : 0.0; //min
+      }
     }
 
     iter++;
