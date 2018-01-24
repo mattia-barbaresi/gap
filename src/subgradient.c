@@ -98,7 +98,7 @@ gap_calculate_lagrangian_a (Problem * problem)
 
           if(val <= problem->b[knap])
           {
-            f[k+1][val] = f[k+1][val] > f[k][q] + problem->c[knap][k] ? f[k+1][val] : f[k][q] + problem->c[knap][k];
+            f[k+1][val] = f[k+1][val] > f[k][q] + problem->costs[knap][k] ? f[k+1][val] : f[k][q] + problem->costs[knap][k];
           }
         }
       }
@@ -107,6 +107,7 @@ gap_calculate_lagrangian_a (Problem * problem)
 
     int b = problem->b[knap];
 
+    printf("x:  ");
     // calculate solution
     for (k = problem->n; k > 0; --k)
     {
@@ -119,7 +120,9 @@ gap_calculate_lagrangian_a (Problem * problem)
       {
         problem->x[knap][k-1] = 0;
       }
+      printf("%d ", problem->x[knap][k-1]);
     }
+    printf("\n");
   }
 }
 
@@ -148,7 +151,7 @@ gap_calculate_lagrangian_b (Problem * problem)
             minValue = problem->costs[i][j];
           }
       }
-   problem->x[minIndex][j] = 1;
+    problem->x[minIndex][j] = 1;
   }
 }
 
@@ -353,8 +356,8 @@ int
 gap_subgradient (Problem * problem, char relaxType)
 {
   int iter = 0;
-  int maxIter = 150;
-  float alpha = 1;
+  int maxIter = 20;
+  float alpha = 2;
   int delta = 20;
   int trials = 0;
   int result = 0;
@@ -382,17 +385,16 @@ gap_subgradient (Problem * problem, char relaxType)
     xOpt[i] = calloc (problem->n, sizeof (int));
 
   // init u
-   if(relaxType == 'a')
-      problem->u = calloc (problem->n, sizeof (float));
+  if(relaxType == 'a')
+    problem->u = calloc (problem->n, sizeof (float));
   else if(relaxType == 'b')
-      problem->u = calloc (problem->m, sizeof (float));
+    problem->u = calloc (problem->m, sizeof (float));
     
   while(iter <= maxIter)
   {
     // init costs for relaxing constraint:
     if(relaxType == 'a')
       gap_get_costs_with_relaxiation_a(problem);
-
     else if(relaxType == 'b')
       gap_get_costs_with_relaxiation_b(problem);
 
@@ -408,9 +410,9 @@ gap_subgradient (Problem * problem, char relaxType)
     else if(relaxType == 'b')
       lu = gap_calcuate_lagrangian_function_b(problem);
 
-      printf("lu: %f\n",lu );
     if(lu > problem->lb)
     {
+      printf("lu: %f\n",lu );
       problem->lb = lu;
       trials = 0;
       copyMatrix(problem->x, xOpt, problem->m, problem->n);
@@ -452,7 +454,7 @@ gap_subgradient (Problem * problem, char relaxType)
     else if(relaxType == 'b'){
       for (int i = 0; i < problem->m; ++i)
       {
-        res = problem->u[i] - alpha * (/*(lz - lu)*/(-0.3*lu)/step_size) * y[i];
+        res = problem->u[i] - alpha * ((lz - lu)/step_size) * y[i];
         problem->u[i] = res < 0.0 ? res : 0.0; //min
       }
     }
