@@ -56,6 +56,17 @@ gap_calcuate_lagrangian_function_b (Problem * problem)
 void
 gap_calculate_lagrangian_a (Problem * problem)
 {
+
+  printf("costs: \n");
+  for (int i = 0; i < problem->m; ++i)
+  {
+    for (int j = 0; j < problem->n; ++j)
+    {
+      printf("%f ", problem->costs[i][j]);
+    }
+    printf("\n");
+  }
+
   int k,val;
 
   // init f(k,q)
@@ -107,7 +118,6 @@ gap_calculate_lagrangian_a (Problem * problem)
 
     int b = problem->b[knap];
 
-    printf("x:  ");
     // calculate solution
     for (k = problem->n; k > 0; --k)
     {
@@ -120,7 +130,15 @@ gap_calculate_lagrangian_a (Problem * problem)
       {
         problem->x[knap][k-1] = 0;
       }
-      printf("%d ", problem->x[knap][k-1]);
+    }
+  }
+
+  printf("x: \n");
+  for (int i = 0; i < problem->m; ++i)
+  {
+    for (int j = 0; j < problem->n; ++j)
+    {
+      printf("%d ", problem->x[i][j]);
     }
     printf("\n");
   }
@@ -192,8 +210,10 @@ gap_are_constraints_satisfied_a (Problem * problem)
       sum = 0;
       for (i = 0; i < problem->m; i++)
       {
+        printf("x(%d,%d): %d\n",i,j,problem->x[i][j]);
         sum += problem->x[i][j];
       }
+      printf("res_a: %d\n", sum);
       if(sum != 1)
       {
         // constraints not satisfied
@@ -218,6 +238,7 @@ gap_are_constraints_satisfied_b (Problem * problem)
       {
         sum += problem->a[i][j] * problem->x[i][j];
       }
+      printf("res_b: %d\n", problem->a[i][j] * problem->x[i][j]);
       if(sum > problem->b[i])
       {
         // constraints not satisfied
@@ -242,6 +263,7 @@ gap_are_lagrangian_constraints_satisfied_a (Problem * problem)
       {
         sum += problem->x[i][j];
       }
+      printf("res_aa: %f\n", problem->u[j] * (sum - 1));
       if( problem->u[j] * (sum - 1) != 0.0)
       {
         // lagrangian constraints not satisfied
@@ -266,7 +288,8 @@ gap_are_lagrangian_constraints_satisfied_b (Problem * problem)
       {
         sum += problem->a[i][j] * problem->x[i][j];
       }
-      if( problem->u[i] * (sum - problem->b[i]) != 0.0)
+      printf("res_bb: %f\n",problem->u[i] * (sum - problem->b[i]) );
+      if( problem->u[i] * (sum - problem->b[i]) < 0.0)
       {
         // lagrangian constraints not satisfied
         // printf("lagrangian constraints not satisfied: %d\n", i);
@@ -301,7 +324,7 @@ int*
 gap_calculate_subgradient_stepsize_vector_b (Problem * problem)
 {
   int sum;
-  int* y = calloc (problem->n, sizeof (int));
+  int* y = calloc (problem->m, sizeof (int));
 
   for (int i = 0; i < problem->m; i++)
   {
@@ -356,7 +379,7 @@ int
 gap_subgradient (Problem * problem, char relaxType)
 {
   int iter = 0;
-  int maxIter = 20;
+  int maxIter = 100;
   float alpha = 2;
   int delta = 20;
   int trials = 0;
@@ -374,7 +397,7 @@ gap_subgradient (Problem * problem, char relaxType)
   // for gap of type c, d, e ...and size [5,10,20] X [100,200]:
   // use double lz = problem->lb; 
   // ----------------------------------------------------------
-  double lz = 2;
+  double lz = -500;
 
   //init lb
   problem->lb = -999999; 
@@ -392,6 +415,7 @@ gap_subgradient (Problem * problem, char relaxType)
     
   while(iter <= maxIter)
   {
+    printf("------------------ iter: %d\n", iter );
     // init costs for relaxing constraint:
     if(relaxType == 'a')
       gap_get_costs_with_relaxiation_a(problem);
@@ -412,7 +436,7 @@ gap_subgradient (Problem * problem, char relaxType)
 
     if(lu > problem->lb)
     {
-      printf("lu: %f\n",lu );
+      // printf("lu: %f\n",lu );
       problem->lb = lu;
       trials = 0;
       copyMatrix(problem->x, xOpt, problem->m, problem->n);
@@ -443,18 +467,22 @@ gap_subgradient (Problem * problem, char relaxType)
       step_size = (double)gap_calculate_subgradient_stepsize(y, problem->m);
 
     //update u:
+    // double numerator = lz - lu;
+    double numerator = -1.3*lu;
 
     if(relaxType == 'a'){
       for (int j = 0; j < problem->n; ++j)
       {
-        res = problem->u[j] - alpha * ((lz - lu)/step_size) * y[j];
+        res = problem->u[j] - alpha * (numerator/step_size) * y[j];
+        printf("%f = %f - %f * %f * %d \n",res,problem->u[j],alpha,(numerator/step_size), y[j] );
         problem->u[j] = res;
+        printf("update u: %f\n", res);
       }
     }
     else if(relaxType == 'b'){
       for (int i = 0; i < problem->m; ++i)
       {
-        res = problem->u[i] - alpha * ((lz - lu)/step_size) * y[i];
+        res = problem->u[i] - alpha * (numerator/step_size) * y[i];
         problem->u[i] = res < 0.0 ? res : 0.0; //min
       }
     }
