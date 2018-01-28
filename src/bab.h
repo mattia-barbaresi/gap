@@ -26,6 +26,6 @@
 #include "problem.h"
 
 //b&b
-int gap_bab(Problem * problem);
+int gap_bab (Problem * problem);
 
 #endif

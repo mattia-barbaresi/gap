@@ -30,12 +30,12 @@ gap_calculate_solution (Problem * problem)
   int j;
 
   for (i = 0; i < problem->m; i++)
-  {
-    for (j = 0; j < problem->n; j++)
-  	{
-  	  cost += problem->c[i][j] * problem->x[i][j];
-  	}
-  }
+    {
+      for (j = 0; j < problem->n; j++)
+	{
+	  cost += problem->c[i][j] * problem->x[i][j];
+	}
+    }
   printf ("valore soluzione gap: %d\n", cost);
   return cost;
 }

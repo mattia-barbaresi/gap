@@ -24,8 +24,8 @@ else
 FLAGS+= -pipe -O3 -march=native -DNDEBUG
 endif
 
-all: array_list.o array_stack.o gap.o hash_set.o main.o problem.o subgradient.o bab.o util.o
-	$(CC) $(FLAGS) array_list.o array_stack.o gap.o hash_set.o main.o problem.o util.o subgradient.o bab.o -lm -o main
+all: array_list.o array_stack.o gap.o hash_set.o main.o opt.o problem.o subgradient.o bab.o util.o
+	$(CC) $(FLAGS) array_list.o array_stack.o bab.o gap.o hash_set.o main.o opt.o problem.o subgradient.o util.o -lm -o main
 
 array_list.o: array_list.h array_list.c util.h
 	$(CC) $(FLAGS) array_list.c -c -o array_list.o
@@ -39,7 +39,7 @@ clean:
 gap.o: array_list.h array_stack.h gap.h gap.c problem.h util.h
 	$(CC) $(FLAGS) gap.c -c -o gap.o
 
-subgradient.o: array_list.h array_stack.h subgradient.h subgradient.c problem.h util.h
+subgradient.o: array_list.h array_stack.h opt.h subgradient.h subgradient.c problem.h util.h
 	$(CC) $(FLAGS) subgradient.c -c -o subgradient.o
 
 bab.o: array_list.h array_stack.h bab.h bab.c problem.h util.h
@@ -51,8 +51,11 @@ hash_set.o: hash_set.h hash_set.c util.h
 indent:
 	indent -l120 *.h *.c
 
-main.o: array_list.h gap.h main.c problem.h util.h
+main.o: array_list.h gap.h main.c opt.h problem.h util.h
 	$(CC) $(FLAGS) main.c -c -o main.o
+
+opt.o: opt.h opt.c
+	$(CC) $(FLAGS) opt.c -c -o opt.o
 
 problem.o: array_list.h problem.h problem.c util.h
 	$(CC) $(FLAGS) problem.c -c -o problem.o

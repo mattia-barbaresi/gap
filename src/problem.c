@@ -101,7 +101,7 @@ gap_problem_print (Problem * problem)
     {
       for (j = 0; j < problem->n; j++)
 	{
- 	  printf ("%d%s", problem->a[i][j], (j < (problem->n - 1) ? " " : "\n"));
+	  printf ("%d%s", problem->a[i][j], (j < (problem->n - 1) ? " " : "\n"));
 	}
     }
 

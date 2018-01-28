@@ -21,6 +21,6 @@
 #include "problem.h"
 
 //subgradient
-int gap_subgradient(Problem * problem, char relaxType);
+int gap_subgradient (Problem * problem, int relaxType);
 
 #endif
