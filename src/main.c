@@ -102,61 +102,61 @@ main (int argc, char **argv)
   int verbose = FALSE;
 
   while ((c = getopt (argc, argv, "hi:vV")) != -1)
-  {
-    switch (c)
     {
-    case 'h':
-      print_usage ();
-      return EXIT_SUCCESS;
-    case 'i':
-      ifile = optarg;
-      break;
-    case 'v':
-      print_version ();
-      return EXIT_SUCCESS;
-    case 'V':
-      /* Verbose means print statistics like time spent finding the solution. */
-      verbose = TRUE;
-      break;
-    default:
-      print_error ("invalid option");
+      switch (c)
+	{
+	case 'h':
+	  print_usage ();
+	  return EXIT_SUCCESS;
+	case 'i':
+	  ifile = optarg;
+	  break;
+	case 'v':
+	  print_version ();
+	  return EXIT_SUCCESS;
+	case 'V':
+	  /* Verbose means print statistics like time spent finding the solution. */
+	  verbose = TRUE;
+	  break;
+	default:
+	  print_error ("invalid option");
+	  print_short_usage ();
+	  return EXIT_FAILURE;
+	}
+    }
+
+  if (ifile == NULL)
+    {
+      print_error ("no input file");
       print_short_usage ();
       return EXIT_FAILURE;
     }
-  }
-
-  if (ifile == NULL)
-  {
-    print_error ("no input file");
-    print_short_usage ();
-    return EXIT_FAILURE;
-  }
 
   if ((problems = gap_problems_from_file (ifile)) == NULL)
-  {
-    perror (ERROR_PREFIX);
-    return EXIT_FAILURE;
-  }
-  
+    {
+      perror (ERROR_PREFIX);
+      return EXIT_FAILURE;
+    }
+
   for (i = 0; i < array_list_size (problems); i++)
+    {
+      printf ("\n PROBLEM %d   ===================================\n\n", i);
+
+      if (gap_subgradient (array_list_get (problems, i), 'a') == 0)
 	{
-		printf("\n PROBLEM %d   ===================================\n\n",i);
+	  //optimal solution found
+	  printf ("Exit subgradient with optimal solution!\n");
+	}
+      else
+	{
+	  //b&b
+	  gap_bab (array_list_get (problems, i));
+	}
 
-    if(gap_subgradient (array_list_get (problems, i),'a') == 0)
-    {
-      //optimal solution found
-      printf("Exit subgradient with optimal solution!\n");
+      //print solution
+      gap_calculate_solution (array_list_get (problems, i));
+      // gap_problem_print(array_list_get (problems, i));
     }
-    else
-    {
-      //b&b
-      gap_bab(array_list_get (problems, i));
-    }
-
-    //print solution
-    gap_calculate_solution (array_list_get (problems, i));
-    // gap_problem_print(array_list_get (problems, i));
-  }
 
   array_list_clear (problems, (Destructor) gap_problem_free);
   array_list_free (problems);

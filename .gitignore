@@ -8,3 +8,6 @@ main
 
 # GNU Emacs backup files
 *~
+
+#documents
+docs/

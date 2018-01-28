@@ -24,6 +24,5 @@
 int gap_calculate_solution (Problem * problem);
 
 // invert costs of problem
-void
-invert_for_max_problem (Problem * problem);
+void invert_for_max_problem (Problem * problem);
 #endif

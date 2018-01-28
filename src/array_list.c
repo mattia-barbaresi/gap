@@ -46,7 +46,7 @@ array_list_add (ArrayList * list, void *element)
   if (list->capacity == list->size)
     {
       if (!array_list_grow (list))
-        return FALSE;
+	return FALSE;
     }
 
   list->elements[list->size++] = element;
@@ -93,9 +93,9 @@ array_list_ensure_capacity (ArrayList * list, size_t capacity)
   if (capacity > list->capacity)
     {
       if ((list->elements = realloc (list->elements, capacity * sizeof (void *))) == NULL)
-        {
-          return FALSE;
-        }
+	{
+	  return FALSE;
+	}
 
       list->capacity = capacity;
     }
@@ -173,9 +173,9 @@ array_list_trim_to_size (ArrayList * list)
       capacity = list->size > 0 ? list->size : 1;
 
       if ((list->elements = realloc (list->elements, capacity)) == NULL)
-        {
-          return FALSE;
-        }
+	{
+	  return FALSE;
+	}
 
       list->capacity = capacity;
     }
