@@ -23,16 +23,20 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
-#include "gap.h"
-#include "subgradient.h"
 #include "bab.h"
+#include "gap.h"
+#include "opt.h"
 #include "problem.h"
+#include "subgradient.h"
 #include "util.h"
 
 #define ERROR_PREFIX "Error"
 #define VERSION "0.1"
+
+static Options *parse (int argc, char **argv);
 
 /**
  * @brief Print an error message.
@@ -54,6 +58,67 @@ static void print_usage ();
  */
 static void print_version ();
 
+static Options *
+parse (int argc, char **argv)
+{
+  double alpha;
+  int c;
+  Options *opt = opt_new ();
+  extern char *optarg;
+
+  while ((c = getopt (argc, argv, "a:hi:r:vV")) != -1)
+    {
+      switch (c)
+	{
+	case 'a':
+	  alpha = strtod (optarg, NULL);
+
+	  if (alpha == 0.0)
+	    {
+	      print_error ("invalid alpha value");
+	      print_short_usage ();
+	      exit (EXIT_FAILURE);
+	    }
+
+	  opt_set_alpha (opt, alpha);
+	  break;
+	case 'h':
+	  print_usage ();
+	  exit (EXIT_SUCCESS);
+	case 'i':
+	  opt_set_file (opt, optarg);
+	  break;
+	case 'r':
+	  if (strcmp (optarg, OPT_RELAX_CAPACITY_NAME) == 0)
+	    {
+	      opt_set_relax (opt, OPT_RELAX_CAPACITY);
+	    }
+	  else if (strcmp (optarg, OPT_RELAX_QUANTITY_NAME) == 0)
+	    {
+	      opt_set_relax (opt, OPT_RELAX_QUANTITY);
+	    }
+	  else
+	    {
+	      print_error ("invalid relax value");
+	      print_short_usage ();
+	      exit (EXIT_FAILURE);
+	    }
+	  break;
+	case 'v':
+	  print_version ();
+	  exit (EXIT_SUCCESS);
+	case 'V':
+	  opt_set_verbose (opt, TRUE);
+	  break;
+	default:
+	  print_error ("invalid option");
+	  print_short_usage ();
+	  exit (EXIT_FAILURE);
+	}
+    }
+
+  return opt;
+}
 
 static void
 print_error (char *message)
@@ -65,10 +130,12 @@ static void
 print_short_usage ()
 {
   printf ("List of options:\n");
-  printf ("  -h         Print this message\n");
-  printf ("  -i <file>  Specify the input file\n");
-  printf ("  -v         Print program version\n");
-  printf ("  -V         Verbose\n");
+  printf ("  -a <double>            Alpha parameter initial value\n");
+  printf ("  -h                     Print this message\n");
+  printf ("  -i <file>              Specify the input file\n");
+  printf ("  -r <capacity|quantity> Relaxation type\n");
+  printf ("  -v                     Print program version\n");
+  printf ("  -V                     Verbose\n");
 }
 
 static void
@@ -94,45 +161,19 @@ print_version ()
 int
 main (int argc, char **argv)
 {
-  int c;
   int i;
-  char *ifile = NULL;
+  Options *opt;
   ArrayList *problems;
-  extern char *optarg;
-  int verbose = FALSE;
+  opt = parse (argc, argv);
 
-  while ((c = getopt (argc, argv, "hi:vV")) != -1)
-    {
-      switch (c)
-	{
-	case 'h':
-	  print_usage ();
-	  return EXIT_SUCCESS;
-	case 'i':
-	  ifile = optarg;
-	  break;
-	case 'v':
-	  print_version ();
-	  return EXIT_SUCCESS;
-	case 'V':
-	  /* Verbose means print statistics like time spent finding the solution. */
-	  verbose = TRUE;
-	  break;
-	default:
-	  print_error ("invalid option");
-	  print_short_usage ();
-	  return EXIT_FAILURE;
-	}
-    }
-
-  if (ifile == NULL)
+  if (opt_get_file (opt) == NULL)
     {
       print_error ("no input file");
       print_short_usage ();
       return EXIT_FAILURE;
     }
 
-  if ((problems = gap_problems_from_file (ifile)) == NULL)
+  if ((problems = gap_problems_from_file (opt_get_file (opt))) == NULL)
     {
       perror (ERROR_PREFIX);
       return EXIT_FAILURE;
@@ -142,14 +183,14 @@ main (int argc, char **argv)
     {
       printf ("\n PROBLEM %d   ===================================\n\n", i);
 
-      if (gap_subgradient (array_list_get (problems, i), 'a') == 0)
+      if (gap_subgradient (array_list_get (problems, i), opt->relax) == 0)
 	{
-	  //optimal solution found
+	  // We found the optimal solution
 	  printf ("Exit subgradient with optimal solution!\n");
 	}
       else
 	{
-	  //b&b
+	  // Branch and bound
 	  gap_bab (array_list_get (problems, i));
 	}
 
@@ -160,6 +201,7 @@ main (int argc, char **argv)
 
   array_list_clear (problems, (Destructor) gap_problem_free);
   array_list_free (problems);
+  opt_free (opt);
 
   return EXIT_SUCCESS;
 }

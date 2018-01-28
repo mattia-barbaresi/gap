@@ -15,12 +15,35 @@
  * along with gap.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SUBGRADIENT_H
-#define _SUBGRADIENT_H
+#include <stdlib.h>
 
-#include "problem.h"
+#include "opt.h"
 
-//subgradient
-int gap_subgradient (Problem * problem, int relaxType);
+#define OPT_ALPHA_DEFAULT 2.0
+#define OPT_RELAX_DEFAULT 0
+#define OPT_VERBOSE_DEFAULT 0
 
-#endif
+void
+opt_free (Options * opt)
+{
+  free (opt);
+}
+
+Options *
+opt_new ()
+{
+  Options *opt;
+
+  opt = malloc (sizeof (Options));
+
+  if (opt == NULL)
+    {
+      return NULL;
+    }
+
+  opt->alpha = OPT_ALPHA_DEFAULT;
+  opt->relax = OPT_RELAX_DEFAULT;
+  opt->verbose = OPT_VERBOSE_DEFAULT;
+
+  return opt;
+}
