@@ -33,17 +33,14 @@ array_list.o: array_list.h array_list.c util.h
 array_stack.o: array_stack.h array_stack.c util.h
 	$(CC) $(FLAGS) array_stack.c -c -o array_stack.o
 
+bab.o: array_list.h array_stack.h bab.h bab.c problem.h util.h
+	$(CC) $(FLAGS) bab.c -c -o bab.o
+
 clean:
 	rm -f *.o main
 
 gap.o: array_list.h array_stack.h gap.h gap.c problem.h util.h
 	$(CC) $(FLAGS) gap.c -c -o gap.o
-
-subgradient.o: array_list.h array_stack.h opt.h subgradient.h subgradient.c problem.h util.h
-	$(CC) $(FLAGS) subgradient.c -c -o subgradient.o
-
-bab.o: array_list.h array_stack.h bab.h bab.c problem.h util.h
-	$(CC) $(FLAGS) bab.c -c -o bab.o
 
 hash_set.o: hash_set.h hash_set.c util.h
 	$(CC) $(FLAGS) hash_set.c -c -o hash_set.o
@@ -59,6 +56,9 @@ opt.o: opt.h opt.c
 
 problem.o: array_list.h problem.h problem.c util.h
 	$(CC) $(FLAGS) problem.c -c -o problem.o
+
+subgradient.o: array_list.h array_stack.h opt.h subgradient.h subgradient.c problem.h util.h
+	$(CC) $(FLAGS) subgradient.c -c -o subgradient.o
 
 util.o: util.h util.c
 	$(CC) $(FLAGS) util.c -c -o util.o
