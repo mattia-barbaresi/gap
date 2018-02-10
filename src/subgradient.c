@@ -242,6 +242,7 @@ gap_are_lagrangian_constraints_satisfied_a (Problem * problem)
 	{
 	  sum += problem->x[i][j];
 	}
+        printf("sum: %d \n",sum);
       if (problem->u[j] * (sum - 1) != 0.0)
 	{
 	  // lagrangian constraints not satisfied
@@ -358,10 +359,10 @@ gap_subgradient (Problem * problem, int relaxType)
   int iter = 0;
   int maxIter = 150;
   float alpha = 2;
-  int delta = 20;
+  int delta = 30;
   int trials = 0;
   int result = 0;
-  invert_for_max_problem(problem);
+  // invert_for_max_problem(problem);
 
   double lu;
   int *y;
@@ -412,7 +413,7 @@ gap_subgradient (Problem * problem, int relaxType)
 
       if (lu > problem->lb)
 	{
-	  printf ("lu: %f\n", lu);
+	  // printf ("lu: %f\n", lu);
 	  problem->lb = lu;
 	  trials = 0;
 	  copyMatrix (problem->x, xOpt, problem->m, problem->n);
