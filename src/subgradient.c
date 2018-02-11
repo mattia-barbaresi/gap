@@ -75,33 +75,34 @@ gap_calculate_lagrangian_a (Problem * problem)
       f[0][0] = 0;
       for (int z = 1; z <= problem->b[knap]; ++z)
 	{
-	  f[0][z] = -9999;	// -inf
+	  f[0][z] = -999999;	// -inf
 	}
 
       k = 0;
-
       // ciclo su k
-      while (k != problem->n)
+      while (k < problem->n)
 	{
 	  // init f(k+1,q)
 	  for (int z = 0; z <= problem->b[knap]; ++z)
 	    {
-	      f[k + 1][z] = -9999;	// -inf
+	      f[k + 1][z] = -999999;	// -inf
 	    }
-
 	  for (int q = 0; q <= problem->b[knap]; ++q)
 	    {
 	      if (f[k][q] >= 0)
 		{
 		  f[k + 1][q] = f[k + 1][q] > f[k][q] ? f[k + 1][q] : f[k][q];
 
-		  val = q + problem->a[knap][k];
+                  // printf("vals: %d , %d\n", f[k + 1][q], f[k][q]  );
+                  // printf("f: %d\n", f[k + 1][q]);
 
+		  val = q + problem->a[knap][k+1];
 		  if (val <= problem->b[knap])
 		    {
 		      f[k + 1][val] =
-			f[k + 1][val] >
-			f[k][q] + problem->costs[knap][k] ? f[k + 1][val] : f[k][q] + problem->costs[knap][k];
+			f[k + 1][val] > f[k][q] + problem->costs[knap][k+1]
+                         ? f[k + 1][val] 
+                         : f[k][q] + problem->costs[knap][k+1];
 		    }
 		}
 	    }
@@ -113,6 +114,7 @@ gap_calculate_lagrangian_a (Problem * problem)
       // calculate solution
       for (k = problem->n; k > 0; --k)
 	{
+                // printf("%f %f\n", f[k][b] , f[k - 1][b]);
 	  if (f[k][b] > f[k - 1][b])
 	    {
 	      problem->x[knap][k - 1] = 1;
@@ -123,8 +125,17 @@ gap_calculate_lagrangian_a (Problem * problem)
 	      problem->x[knap][k - 1] = 0;
 	    }
 	}
+
+        // printf("x:\n");
+        // for (int i = 0; i < problem->m; ++i)
+        // {
+        //         for (int j = 0; j < problem->n; ++j)
+        //                 printf("%d ", problem->x[i][j] );
+        //         printf("\n");
+        // }
     }
 }
+
 
 // b: calculates optimal for L(u)
 // soluzione per gli n item
@@ -159,13 +170,16 @@ gap_calculate_lagrangian_b (Problem * problem)
 void
 gap_get_costs_with_relaxiation_a (Problem * problem)
 {
+        // printf("costs: \n");
   for (int i = 0; i < problem->m; ++i)
     {
       for (int j = 0; j < problem->n; ++j)
 	{
 	  problem->costs[i][j] = problem->c[i][j] - problem->u[j];
+          // printf("%f ", problem->costs[i][j] );
 	}
     }
+    // printf("\n");
 }
 
 // b: calculates costs = c - (u * a)
@@ -332,8 +346,8 @@ int
 gap_is_solution_optimal_a (Problem * problem)
 {
   if (gap_are_constraints_satisfied_a (problem) == 1 && gap_are_lagrangian_constraints_satisfied_a (problem) == 1)
-    return 0;
-  return 1;
+    return 1;
+  return 0;
 }
 
 // b: checks optimality (all constraints satisfied)
@@ -341,8 +355,8 @@ int
 gap_is_solution_optimal_b (Problem * problem)
 {
   if (gap_are_constraints_satisfied_b (problem) == 1 && gap_are_lagrangian_constraints_satisfied_b (problem) == 1)
-    return 0;
-  return 1;
+    return 1;
+  return 0;
 }
 
 // subgradient
@@ -375,7 +389,7 @@ gap_subgradient (Problem * problem, int relaxType)
   // for gap of type c, d, e ...and size [5,10,20] X [100,200]:
   // use double lz = problem->lb; 
   // ----------------------------------------------------------
-  double lz = 2;
+  // double lz = 2;
 
   //init lb
   problem->lb = -999999;
@@ -424,7 +438,7 @@ gap_subgradient (Problem * problem, int relaxType)
 	  else if (relaxType == OPT_RELAX_QUANTITY)
 	    result = gap_is_solution_optimal_b (problem);
 
-	  if (result == 0)
+	  if (result == 1)
 	    {
 	      printf ("Exit subgradient function...optimal solution found! (iter: %d)\n", iter);
 	      return 0;
@@ -444,21 +458,20 @@ gap_subgradient (Problem * problem, int relaxType)
 	step_size = (double) gap_calculate_subgradient_stepsize (y, problem->m);
 
       //update u:
-      // double numerator = lz - lu;
-      double numerator = -1.3 * lu;
       if (relaxType == OPT_RELAX_CAPACITY)
 	{
 	  for (int j = 0; j < problem->n; ++j)
 	    {
-	      res = problem->u[j] - alpha * (numerator / step_size) * y[j];
-	      problem->u[j] = res;
-	    }
-	}
+	      res = problem->u[j] - alpha * ((-1.3 * lu ) / step_size) * y[j];
+              // printf("res: %f \n", res);
+              problem->u[j] = res;
+            }
+        }
       else if (relaxType == OPT_RELAX_QUANTITY)
-	{
-	  for (int i = 0; i < problem->m; ++i)
-	    {
-	      res = problem->u[i] - alpha * (numerator / step_size) * y[i];
+        {
+          for (int i = 0; i < problem->m; ++i)
+            {
+              res = problem->u[i] - alpha * ((-1.3 * lu ) / step_size) * y[i];
 	      problem->u[i] = res < 0.0 ? res : 0.0;	//min
 	    }
 	}
@@ -468,7 +481,7 @@ gap_subgradient (Problem * problem, int relaxType)
 
       if (trials == delta)
 	{
-	  alpha = alpha * 0.75;
+	  alpha = alpha * 0.5;
 	  trials = 0;
 	}
     }

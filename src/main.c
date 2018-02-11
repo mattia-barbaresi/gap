@@ -196,7 +196,7 @@ main (int argc, char **argv)
 
       //print solution
       gap_calculate_solution (array_list_get (problems, i));
-      // gap_problem_print(array_list_get (problems, i));
+      // gap_problem_print (array_list_get (problems, i));
     }
 
   array_list_clear (problems, (Destructor) gap_problem_free);
