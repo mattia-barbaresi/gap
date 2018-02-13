@@ -362,8 +362,8 @@ gap_is_solution_optimal_b (Problem * problem)
 //----------------------------------------------------------
 //
 // NOTA:
-//  _a: functions for relaxing constraints on the number of items (1..n)
-//  _b: functions for relaxing constraints on the capacity of knapsacks (1..m)
+//  _a: functions for relaxing constraints on the number of items (1..n), -r quantity
+//  _b: functions for relaxing constraints on the capacity of knapsacks (1..m), -r capacity
 //
 //----------------------------------------------------------
 int
