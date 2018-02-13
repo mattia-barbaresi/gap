@@ -302,10 +302,10 @@ gap_calculate_subgradient_stepsize_vector_a (Problem * problem)
     {
       sum = 0;
       for (int i = 0; i < problem->m; i++)
-	{
-	  sum += problem->a[i][j] * problem->x[i][j];
-	}
-      y[j] = sum - problem->b[j];
+        {
+          sum += problem->a[i][j] * problem->x[i][j];
+        }
+      y[j] = sum - 1;
     }
   return y;
 }
@@ -315,7 +315,7 @@ int *
 gap_calculate_subgradient_stepsize_vector_b (Problem * problem)
 {
   int sum;
-  int *y = calloc (problem->n, sizeof (int));
+  int *y = calloc (problem->m, sizeof (int));
 
   for (int i = 0; i < problem->m; i++)
     {
@@ -466,17 +466,17 @@ gap_subgradient (Problem * problem, int relaxType)
 	      num = -1.3 * lu;
 	      res = problem->u[j] - alpha * (num / step_size) * y[j];
 	      problem->u[j] = res;
-	    }
-	}
+            }
+        }
       else if (relaxType == OPT_RELAX_CAPACITY)
-	{
-	  for (int i = 0; i < problem->m; ++i)
-	    {
-	      // num = (-1.3 * lu )>0?(-1.3 * lu ):(1.3 * lu );
-	      num = -1.3 * lu;
-	      res = problem->u[i] - alpha * (num / step_size) * y[i];
-	      problem->u[i] = res < 0.0 ? res : 0.0;	//min
-	    }
+        {
+          for (int i = 0; i < problem->m; ++i)
+            {
+              // num = (-1.3 * lu )>0?(-1.3 * lu ):(1.3 * lu );
+              num = -1.3 * lu;
+              res = problem->u[i] - alpha * (num / step_size) * y[i];
+              problem->u[i] = res < 0.0 ? res : 0.0;    //min
+            }
 	}
 
       iter++;
