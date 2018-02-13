@@ -424,9 +424,9 @@ gap_subgradient (Problem * problem, int relaxType)
       else if (relaxType == OPT_RELAX_CAPACITY)
 	lu = gap_calcuate_lagrangian_function_b (problem);
 
-	  printf ("lu: %f\n", lu);
       if (lu > problem->lb)
         {
+	  printf ("lu: %f\n", lu);
 	  problem->lb = lu;
 	  trials = 0;
 	  copyMatrix (problem->x, xOpt, problem->m, problem->n);
@@ -456,7 +456,7 @@ gap_subgradient (Problem * problem, int relaxType)
       else if (relaxType == OPT_RELAX_CAPACITY)
 	step_size = (double) gap_calculate_subgradient_stepsize (y, problem->m);
 
-      int num;
+      float num;
       //update u:
       if (relaxType == OPT_RELAX_QUANTITY)
 	{
