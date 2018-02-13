@@ -331,11 +331,11 @@ gap_calculate_subgradient_stepsize_vector_b (Problem * problem)
 
 //calculates step size
 int
-gap_calculate_subgradient_stepsize (int *y, int m)
+gap_calculate_subgradient_stepsize (int *y, int num)
 {
   int sum = 0;
 
-  for (int i = 0; i < m; i++)
+  for (int i = 0; i < num; i++)
     sum += y[i] * y[i];
   return sum;
 }
@@ -424,9 +424,9 @@ gap_subgradient (Problem * problem, int relaxType)
       else if (relaxType == OPT_RELAX_CAPACITY)
 	lu = gap_calcuate_lagrangian_function_b (problem);
 
-      if (lu > problem->lb)
-	{
 	  printf ("lu: %f\n", lu);
+      if (lu > problem->lb)
+        {
 	  problem->lb = lu;
 	  trials = 0;
 	  copyMatrix (problem->x, xOpt, problem->m, problem->n);
