@@ -24,6 +24,20 @@
 #define _UTIL_H
 
 /**
+ * @brief Maximum value between two.
+ */
+#ifndef MAX
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#endif
+
+/**
+ * @brief Minimum value between two.
+ */
+#ifndef MIN
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#endif
+
+/**
  * @brief True value to be used in boolean conditions.
  */
 #ifndef TRUE
