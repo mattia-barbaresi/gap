@@ -383,12 +383,11 @@ gap_subgradient (Problem * problem, int relaxType)
   float res;
 
   // UB
-  // TODO: calcolarne uno in qualche modo
   // ----------------------------------------------------------
   // for gap of type c, d, e ...and size [5,10,20] X [100,200]:
   // use double lz = problem->lb; 
   // ----------------------------------------------------------
-  // double lz = 1500;
+  double lz = problem->lb;
 
   //init lb
   problem->lb = -999999;
@@ -424,9 +423,9 @@ gap_subgradient (Problem * problem, int relaxType)
       else if (relaxType == OPT_RELAX_CAPACITY)
 	lu = gap_calcuate_lagrangian_function_b (problem);
 
+	  printf ("lu: %f\n", lu);
       if (lu > problem->lb)
         {
-	  printf ("lu: %f\n", lu);
 	  problem->lb = lu;
 	  trials = 0;
 	  copyMatrix (problem->x, xOpt, problem->m, problem->n);
@@ -456,15 +455,12 @@ gap_subgradient (Problem * problem, int relaxType)
       else if (relaxType == OPT_RELAX_CAPACITY)
 	step_size = (double) gap_calculate_subgradient_stepsize (y, problem->m);
 
-      float num;
       //update u:
       if (relaxType == OPT_RELAX_QUANTITY)
 	{
 	  for (int j = 0; j < problem->n; ++j)
 	    {
-	      // num = (-1.3 * lu )>0?(-1.3 * lu ):(1.3 * lu );
-	      num = -1.3 * lu;
-	      res = problem->u[j] - alpha * (num / step_size) * y[j];
+	      res = problem->u[j] - alpha * ((lz-lu) / step_size) * y[j];
 	      problem->u[j] = res;
             }
         }
@@ -472,9 +468,7 @@ gap_subgradient (Problem * problem, int relaxType)
         {
           for (int i = 0; i < problem->m; ++i)
             {
-              // num = (-1.3 * lu )>0?(-1.3 * lu ):(1.3 * lu );
-              num = -1.3 * lu;
-              res = problem->u[i] - alpha * (num / step_size) * y[i];
+              res = problem->u[i] - alpha * ((lz-lu) / step_size) * y[i];
               problem->u[i] = res < 0.0 ? res : 0.0;    //min
             }
 	}
