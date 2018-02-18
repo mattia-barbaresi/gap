@@ -303,7 +303,7 @@ gap_calculate_subgradient_stepsize_vector_a (Problem * problem)
       sum = 0;
       for (int i = 0; i < problem->m; i++)
         {
-          sum += problem->a[i][j] * problem->x[i][j];
+          sum += problem->x[i][j];
         }
       y[j] = sum - 1;
     }
@@ -460,6 +460,7 @@ gap_subgradient (Problem * problem, int relaxType)
 	  for (int j = 0; j < problem->n; ++j)
 	    {
               res = problem->u[j] - alpha * ((lz-lu) / step_size) * y[j];
+              // printf("%f - %f - (%f) - %f - %d \n", problem->u[j],alpha,(lz-lu),step_size, y[j]);
               problem->u[j] = res;
             }
         }
