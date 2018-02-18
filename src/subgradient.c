@@ -68,14 +68,15 @@ gap_calculate_lagrangian_a (Problem * problem)
       // allocazione dinamica per f(k,q) dove q = 1,2,..,b
       for (int ii = 0; ii <= problem->n; ii++)
 	{
-	  f[ii] = malloc ((problem->b[knap] + 1) * sizeof (int));	//q
+	  f[ii] = malloc ((problem->b[knap] + 1) * sizeof (int));      //q
 	}
 
-      // init f(0,q)
+      // init f(0,0)
       f[0][0] = 0;
+      // init f(0,q)
       for (int z = 1; z <= problem->b[knap]; ++z)
 	{
-	  f[0][z] = -999999;	// -inf
+	  f[0][z] = 0;	// -inf
 	}
 
       k = 0;
@@ -85,53 +86,55 @@ gap_calculate_lagrangian_a (Problem * problem)
 	  // init f(k+1,q)
 	  for (int z = 0; z <= problem->b[knap]; ++z)
 	    {
-	      f[k + 1][z] = -999999;	// -inf
+	      f[k + 1][z] = 999999;	// -inf
 	    }
 	  for (int q = 0; q <= problem->b[knap]; ++q)
 	    {
-	      if (f[k][q] >= 0)
+	      if (f[k][q] <= 0)
 		{
-		  f[k + 1][q] = f[k + 1][q] > f[k][q] ? f[k + 1][q] : f[k][q];
+                  f[k + 1][q] = f[k + 1][q] < f[k][q] ? f[k + 1][q] : f[k][q];
+                  // printf("f(k+1,q): %d , k:%d , q: %d\n",f[k+1][q],k+1,q );
 
-		  // printf("vals: %d , %d\n", f[k + 1][q], f[k][q]  );
-		  // printf("f: %d\n", f[k + 1][q]);
-
-		  val = q + problem->a[knap][k + 1];
+		  val = q + problem->a[knap][k];
 		  if (val <= problem->b[knap])
 		    {
 		      f[k + 1][val] =
-			f[k + 1][val] > f[k][q] + problem->costs[knap][k + 1]
-			? f[k + 1][val] : f[k][q] + problem->costs[knap][k + 1];
+			f[k + 1][val] < f[k][q] + problem->costs[knap][k]
+			? f[k + 1][val] : f[k][q] + problem->costs[knap][k];
+                        // printf("f[%d][%d]: %d\n",k+1,val,f[k + 1][val]);
 		    }
 		}
 	    }
 	  k++;
 	}
 
+        // for (int q = 0; q <= problem->b[knap]; ++q)
+        // {
+        //         for (int k = 0; k <= problem->n; ++k)
+        //                 printf("%d ", f[k][q] );
+        //         printf("\n");
+        // }
+
       int b = problem->b[knap];
 
       // calculate solution
       for (k = problem->n; k > 0; --k)
-	{
-	  // printf("%f %f\n", f[k][b] , f[k - 1][b]);
-	  if (f[k][b] > f[k - 1][b])
+        {
+	  if (f[k][b] < f[k - 1][b] && f[k][b]<0)
 	    {
-	      problem->x[knap][k - 1] = 1;
+	      problem->x[knap][k -1] = 1;
 	      b -= problem->a[knap][k - 1];
 	    }
 	  else
 	    {
-	      problem->x[knap][k - 1] = 0;
+	      problem->x[knap][k-1] = 0;
 	    }
 	}
 
-      // printf("x:\n");
-      // for (int i = 0; i < problem->m; ++i)
-      // {
-      //         for (int j = 0; j < problem->n; ++j)
-      //                 printf("%d ", problem->x[i][j] );
-      //         printf("\n");
-      // }
+      printf("(%d)x:\n",knap);
+      for (int j = 0; j < problem->n; ++j)
+              printf("%d ", problem->x[knap][j] );
+      printf("\n"); 
     }
 }
 
@@ -370,7 +373,7 @@ int
 gap_subgradient (Problem * problem, int relaxType)
 {
   int iter = 0;
-  int maxIter = 150;
+  int maxIter = 3;
   float alpha = 2;
   int delta = 30;
   int trials = 0;
@@ -378,17 +381,17 @@ gap_subgradient (Problem * problem, int relaxType)
   // invert_for_max_problem(problem);
 
   double lu;
-  int *y;
   double step_size;
+  int *y;
   float res;
 
   // UB
   // ----------------------------------------------------------
-  // for gap of type c, d, e ...and size [5,10,20] X [100,200]:
-  // use double lz = problem->lb; 
+  // for gap of type c, d, e:
+  // double lz = problem->lb; 
   // ----------------------------------------------------------
   double lz = problem->lb;
-
+lz=3;
   //init lb
   problem->lb = -999999;
 
@@ -423,9 +426,9 @@ gap_subgradient (Problem * problem, int relaxType)
       else if (relaxType == OPT_RELAX_CAPACITY)
 	lu = gap_calcuate_lagrangian_function_b (problem);
 
-	  printf ("lu: %f\n", lu);
       if (lu > problem->lb)
         {
+	  printf ("lu: %f\n", lu);
 	  problem->lb = lu;
 	  trials = 0;
 	  copyMatrix (problem->x, xOpt, problem->m, problem->n);
@@ -460,8 +463,9 @@ gap_subgradient (Problem * problem, int relaxType)
 	{
 	  for (int j = 0; j < problem->n; ++j)
 	    {
-	      res = problem->u[j] - alpha * ((lz-lu) / step_size) * y[j];
-	      problem->u[j] = res;
+              res = problem->u[j] - alpha * ((lz-lu) / step_size) * y[j];
+              printf("res: %f \n", res);
+              problem->u[j] = res;
             }
         }
       else if (relaxType == OPT_RELAX_CAPACITY)
