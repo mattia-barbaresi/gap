@@ -131,10 +131,10 @@ gap_calculate_lagrangian_a (Problem * problem)
 	    }
 	}
 
-      printf("(%d)x:\n",knap);
-      for (int j = 0; j < problem->n; ++j)
-              printf("%d ", problem->x[knap][j] );
-      printf("\n"); 
+      // printf("(%d)x:\n",knap);
+      // for (int j = 0; j < problem->n; ++j)
+      //         printf("%d ", problem->x[knap][j] );
+      // printf("\n"); 
     }
 }
 
@@ -258,7 +258,6 @@ gap_are_lagrangian_constraints_satisfied_a (Problem * problem)
 	{
 	  sum += problem->x[i][j];
 	}
-      printf ("sum: %d \n", sum);
       if (problem->u[j] * (sum - 1) != 0.0)
 	{
 	  // lagrangian constraints not satisfied
@@ -373,7 +372,7 @@ int
 gap_subgradient (Problem * problem, int relaxType)
 {
   int iter = 0;
-  int maxIter = 3;
+  int maxIter = 150;
   float alpha = 2;
   int delta = 30;
   int trials = 0;
@@ -391,7 +390,6 @@ gap_subgradient (Problem * problem, int relaxType)
   // double lz = problem->lb; 
   // ----------------------------------------------------------
   double lz = problem->lb;
-lz=3;
   //init lb
   problem->lb = -999999;
 
@@ -464,7 +462,6 @@ lz=3;
 	  for (int j = 0; j < problem->n; ++j)
 	    {
               res = problem->u[j] - alpha * ((lz-lu) / step_size) * y[j];
-              printf("res: %f \n", res);
               problem->u[j] = res;
             }
         }
