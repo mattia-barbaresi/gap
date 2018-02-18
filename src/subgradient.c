@@ -84,7 +84,7 @@ gap_calculate_lagrangian_a (Problem * problem)
 	  // init f(k+1,q)
 	  for (int z = 0; z <= problem->b[knap]; ++z)
 	    {
-	      f[k + 1][z] = 0;	// -inf
+	      f[k + 1][z] = 0;
 	    }
 	  for (int q = 0; q <= problem->b[knap]; ++q)
 	    {
@@ -372,7 +372,7 @@ gap_subgradient (Problem * problem, int relaxType)
   int iter = 0;
   int maxIter = 150;
   float alpha = 2;
-  int delta = 30;
+  int delta = 20;
   int trials = 0;
   int result = 0;
   // invert_for_max_problem(problem);
@@ -388,6 +388,7 @@ gap_subgradient (Problem * problem, int relaxType)
   // double lz = problem->lb; 
   // ----------------------------------------------------------
   double lz = problem->lb;
+
   //init lb
   problem->lb = -999999;
 
@@ -424,7 +425,7 @@ gap_subgradient (Problem * problem, int relaxType)
 
       if (lu > problem->lb)
         {
-	  printf ("lu: %f\n", lu);
+	  // printf ("lu: %f\n", lu);
 	  problem->lb = lu;
 	  trials = 0;
 	  copyMatrix (problem->x, xOpt, problem->m, problem->n);
@@ -469,6 +470,7 @@ gap_subgradient (Problem * problem, int relaxType)
           for (int i = 0; i < problem->m; ++i)
             {
               res = problem->u[i] - alpha * ((lz-lu) / step_size) * y[i];
+              // printf("%f - %f - (%f) - %f - %d \n", problem->u[i],alpha,(lz-lu),step_size, y[i]);
               problem->u[i] = res < 0.0 ? res : 0.0;    //min
             }
 	}
