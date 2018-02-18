@@ -71,12 +71,10 @@ gap_calculate_lagrangian_a (Problem * problem)
 	  f[ii] = malloc ((problem->b[knap] + 1) * sizeof (int));      //q
 	}
 
-      // init f(0,0)
-      f[0][0] = 0;
       // init f(0,q)
-      for (int z = 1; z <= problem->b[knap]; ++z)
+      for (int z = 0; z <= problem->b[knap]; ++z)
 	{
-	  f[0][z] = 0;	// -inf
+	  f[0][z] = 0;
 	}
 
       k = 0;
@@ -86,7 +84,7 @@ gap_calculate_lagrangian_a (Problem * problem)
 	  // init f(k+1,q)
 	  for (int z = 0; z <= problem->b[knap]; ++z)
 	    {
-	      f[k + 1][z] = 999999;	// -inf
+	      f[k + 1][z] = 0;	// -inf
 	    }
 	  for (int q = 0; q <= problem->b[knap]; ++q)
 	    {
