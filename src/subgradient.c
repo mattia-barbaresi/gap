@@ -382,12 +382,14 @@ gap_subgradient (Problem * problem, int relaxType)
   int *y;
   float res;
 
+  time_t t = clock();
+
   // UB
   // ----------------------------------------------------------
   // for gap of type c, d, e:
   // double lz = problem->lb; 
   // ----------------------------------------------------------
-  double lz = problem->lb;
+  double lz = problem->lb+10;
 
   //init lb
   problem->lb = -999999;
@@ -439,6 +441,8 @@ gap_subgradient (Problem * problem, int relaxType)
 	  if (result == 1)
             {
               printf ("Exit subgradient function...optimal solution found! (iter: %d)\n", iter);
+              t = clock() - t;
+              printf("time: %f sec.\n", (float)t/CLOCKS_PER_SEC);
               return 0;
             }
 	}
@@ -486,5 +490,15 @@ gap_subgradient (Problem * problem, int relaxType)
     }
 
   copyMatrix (xOpt, problem->x, problem->m, problem->n);
+  float t2 = (float)(clock() -t)/CLOCKS_PER_SEC;
+  
+  printf ("lu: %f , ", lu);
+  // printf("time: %f sec.\n", t2);
+  printf("out:  %f, %f, ", problem->lb, t2 );
+  // printf("----------------------------------------------------\n");
+  FILE *pFile;
+  pFile=fopen("/home/mat/Desktop/gap/dataset/table.csv", "a");
+  fprintf(pFile, "%f, %f, ", problem->lb, t2 );
+  fclose(pFile);
   return 1;
 }

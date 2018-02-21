@@ -5,7 +5,8 @@ main
 # Sublime Text files
 *.sublime-project
 *.sublime-workspace
-
+#scripts
+*.sh
 # GNU Emacs backup files
 *~
 
